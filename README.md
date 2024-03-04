@@ -1,1 +1,1 @@
-# SNSBotforGPTPlus
+# SNSBotForGPTPlus
