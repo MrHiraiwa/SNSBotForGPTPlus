@@ -422,72 +422,6 @@ def prune_old_messages(user_data, max_token_num):
         total_chars -= len(encoding.encode(removed_message['content']))
     return user_data
 
-def response_filter(bot_reply):
-    # パターン定義
-    # pattern1 = r"!\[画像\].*"
-    pattern2 = r"!\[.*\]\(.*\.jpg\)|!\[.*\]\(.*\.png\)"
-    pattern3 = r"\[画像.*\]"
-    pattern4 = r"\(.*\.jpg\)|\(.*\.png\)"
-    pattern5 = r"!\[.*\]\(http.*\.(jpg|png)\)"
-    pattern6 = r"\[参照元URL\]\((.*?)\)"
-    pattern7 = r"\n(http[s]?://[^\s]+)"
-    pattern8 = r"https://[^\s]+\.(jpg|png)"
-    pattern9 = r"\[参照元\]\((.*?)\)"
-    pattern10 = r"\[参照元[:：](https?://[^\]]+)\]"
-    pattern11 = r"参照元: (http[s]?://[^\s]+)"
-    pattern12 = r"「"
-    pattern13 = r"」"
-    pattern14 = r"【"
-    pattern15 = r"】"
-    pattern16 = r"\["
-    pattern17 = r"\]"
-    pattern18 = r"描いたイラストの"
-    pattern19 = r"参照元："
-    pattern20 = r"参照元➡️"
-    pattern21 = r"参照元👉"
-    pattern22 = r"参照元URL:"
-    pattern23 = r"参照元はこちら:"
-    pattern24 = r"詳細はこちら➡️"
-    pattern25 = r"参照元はこちら➡️"
-    pattern26 = r"参照元はこちら👉"
-    pattern27 = r"参照元はこちら→"
-    pattern28 = r"詳細[:：]"
-    pattern29 = r"参照元[:：].*?\((https?://[^\)]+)\)"
-
-    # パターンに基づいてテキストをフィルタリング
-    # bot_reply = re.sub(pattern1, "", bot_reply).strip()
-    bot_reply = re.sub(pattern2, "", bot_reply).strip()
-    bot_reply = re.sub(pattern3, "", bot_reply).strip()
-    bot_reply = re.sub(pattern4, "", bot_reply).strip()
-    bot_reply = re.sub(pattern5, "", bot_reply).strip()
-    bot_reply = re.sub(pattern6, r" \1", bot_reply).strip()
-    bot_reply = re.sub(pattern7, r" \1", bot_reply).strip()
-    bot_reply = re.sub(pattern8, "", bot_reply).strip()
-    bot_reply = re.sub(pattern9, r" \1", bot_reply).strip()
-    bot_reply = re.sub(pattern10, r" \1", bot_reply).strip()
-    bot_reply = re.sub(pattern11, r" \1", bot_reply).strip()
-    bot_reply = re.sub(pattern12, "　", bot_reply).strip()
-    bot_reply = re.sub(pattern13, "", bot_reply).strip()
-    bot_reply = re.sub(pattern14, "　", bot_reply).strip()
-    bot_reply = re.sub(pattern15, "", bot_reply).strip()
-    bot_reply = re.sub(pattern16, "　", bot_reply).strip()
-    bot_reply = re.sub(pattern17, "", bot_reply).strip()
-    bot_reply = re.sub(pattern18, "", bot_reply).strip()
-    bot_reply = re.sub(pattern19, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern20, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern21, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern22, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern23, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern24, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern25, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern26, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern27, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern28, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern29, r" \1", bot_reply).strip()
-    response = re.sub(r"\n{2,}", "\n", bot_reply)
-
-    return response.rstrip('\n')
-
 def overlay_transparent_image(base_image, overlay_image, position=(0, 0)):
     base_image.paste(overlay_image, position, overlay_image)
     return base_image
@@ -581,8 +515,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
             return
         if isinstance(bot_reply, tuple):
             bot_reply = bot_reply[0]
-        print(f"before filtered bot_reply: {bot_reply}")
-        bot_reply = response_filter(bot_reply)
+        
     else:
         print(f"initiate re run_conversation. messages_for_api: {messages_for_api}")
         response = run_conversation(AI_MODEL, messages_for_api)
