@@ -21,6 +21,7 @@ import tiktoken
 from urllib.parse import urljoin
 import urllib.parse
 from PIL import Image
+from urlextract import URLExtract
 
 from functions import chatgpt_functions, run_conversation
 from tweet import generate_tweet
@@ -525,9 +526,10 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     character_count = int(parse_tweet(bot_reply).weightedLength)
     print(f"character_count: {character_count}")
-    extract_url = extract_urls_with_indices(bot_reply)
+    extractor = URLExtract()
+    extract_url = extractor.find_urls(bot_reply)
     if not extract_url:
-        print(f"URL is not include tweet.")
+        print(f"URL is not include doc.")
         generate_tweet(user_id, retry_count + 1, None)
         return
     return
