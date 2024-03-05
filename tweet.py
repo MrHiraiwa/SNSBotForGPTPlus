@@ -166,7 +166,7 @@ def get_image_with_retry(url, max_retries=3, backoff_factor=0.3):
         print(f"Error fetching image from {url}: {e}")
         return None
 
-def generate_tweet2(user_id, bot_reply, retry_count=0, public_img_url=[]):
+def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[]):
     r_bot_reply = bot_reply
     print(f"initiated tweet2. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
             
@@ -201,7 +201,7 @@ def generate_tweet2(user_id, bot_reply, retry_count=0, public_img_url=[]):
         extracted_url = extract_url[0]['url']
     else:
         print(f"URL is not include tweet.")
-        generate_tweet2(user_id, r_bot_reply, retry_count + 1, public_img_url)
+        generate_tweet(tweet_no, user_id, r_bot_reply, retry_count + 1, public_img_url)
         return
         
     if 1 <= character_count <= MAX_CHARACTER_COUNT:
@@ -223,5 +223,5 @@ def generate_tweet2(user_id, bot_reply, retry_count=0, public_img_url=[]):
             print(f"final tweet2 response : {response}")
     else:
         print(f"character_count is {character_count}. tweet2 is retrying...")
-        generate_tweet2(user_id, bot_reply, retry_count + 1, public_img_url)
+        generate_tweet(tweet_no, user_id, bot_reply, retry_count + 1, public_img_url)
     return
