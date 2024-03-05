@@ -40,8 +40,6 @@ REQUIRED_ENV_VARS = [
     "ORDER_PROMPT",
     "PAINT_PROMPT",
     "AI_MODEL",
-    "REGENERATE_ORDER",
-    "REGENERATE_COUNT",
     "PARTIAL_MATCH_FILTER_WORDS",
     "FULL_MATCH_FILTER_WORDS",
     "READ_TEXT_COUNT",
@@ -56,6 +54,8 @@ REQUIRED_ENV_VARS = [
     "NOTE_ORDER_PROMPT",
     "NOTE_MAX_CHARACTER_COUNT",
     "NOTE_OVERLAY_URL",
+    "TWEET_REGENERATE_ORDER",
+    "TWEET_REGENERATE_COUNT",
     "TWEET1",
     "TWEET1_SYSTEM_PROMPT",
     "TWEET1_ORDER_PROMPT",
@@ -111,6 +111,8 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'NOTE_MAX_CHARACTER_COUNT': '280',
     'NOTE_OVERLAY_URL': '',
+    'TWEET_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。URLは省略せずに文章を簡潔、あるいは省略し、文字数を減らしてツイートしてください。',
+    'TWEET_REGENERATE_COUNT': '5',
     'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
@@ -130,9 +132,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
-    'TWEET2_OVERLAY_URL': '',
-    'REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。URLは省略せずに文章を簡潔、あるいは省略し、文字数を減らしてツイートしてください。',
-    'REGENERATE_COUNT': '5'
+    'TWEET2_OVERLAY_URL': ''
 }
 auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -153,9 +153,10 @@ except Exception as e:
     raise
     
 def reload_settings():
-    global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, REGENERATE_ORDER, REGENERATE_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
+    global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
     global NOTE, NOTE_SYSTEM_PROMPT, NOTE_ORDER_PROMPT, NOTE_MAX_CHARACTER_COUNT, NOTE_OVERLAY_URL, note_order_prompt
+    global TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT,
     global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
@@ -170,8 +171,6 @@ def reload_settings():
     else:
         ORDER_PROMPT = []
     PAINT_PROMPT = get_setting('PAINT_PROMPT')
-    REGENERATE_ORDER = get_setting('REGENERATE_ORDER')
-    REGENERATE_COUNT = int(get_setting('REGENERATE_COUNT') or 5)
     PARTIAL_MATCH_FILTER_WORDS = get_setting('PARTIAL_MATCH_FILTER_WORDS')
     if PARTIAL_MATCH_FILTER_WORDS:
         PARTIAL_MATCH_FILTER_WORDS = PARTIAL_MATCH_FILTER_WORDS.split(',')
@@ -197,6 +196,8 @@ def reload_settings():
         NOTE_ORDER_PROMPT = []
     NOTE_MAX_CHARACTER_COUNT = int(get_setting('NOTE_MAX_CHARACTER_COUNT') or 0)
     NOTE_OVERLAY_URL = get_setting('NOTE_OVERLAY_URL')
+    TWEET_REGENERATE_ORDER = get_setting('REGENERATE_ORDER')
+    TWEET_REGENERATE_COUNT = int(get_setting('REGENERATE_COUNT') or 5)
     TWEET1 = get_setting('TWEET1')
     TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
     TWEET1_ORDER_PROMPT = get_setting('TWEET1_ORDER_PROMPT')
