@@ -25,7 +25,7 @@ from urlextract import URLExtract
 
 from functions import chatgpt_functions, run_conversation
 # from note import generate_note
-# from tweet import generate_tweet
+from tweet import generate_tweet
 
 API_KEY = os.getenv('API_KEY')
 API_KEY_SECRET = os.getenv('API_KEY_SECRET')
@@ -533,6 +533,12 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         print(f"URL is not include doc.")
         generate_doc(user_id, retry_count + 1, None)
         return
+        
+    if TWEET1 == 'True':
+        generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
+    if TWEET2 == 'True':
+        generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
+    
     return
     
 if __name__ == "__main__":
