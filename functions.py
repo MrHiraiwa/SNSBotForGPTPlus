@@ -289,7 +289,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                 elif generate_image_called == False and PAINTING_ON  == 'True':
                     i_messages_for_api.append({"role": "user", "content": "SYSTEM: 読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。"})                    
                 else:
-                    if image_result == "":
+                    if image_result == "" and PAINTING_ON  == 'True':
                         print("Error attempt: not image.")
                         driver.quit()
                         return "", image_result
