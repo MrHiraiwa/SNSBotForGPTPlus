@@ -62,26 +62,37 @@ except Exception as e:
     raise
 
 def reload_settings():
-    global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, REGENERATE_ORDER, REGENERATE_COUNT
-    global DEFAULT_USER_ID, order_prompt, MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL
+    global nowDate, nowDateStr, jst, AI_MODEL, REGENERATE_ORDER, REGENERATE_COUNT, DEFAULT_USER_ID
+    global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
+    global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
 
     AI_MODEL = get_setting('AI_MODEL')
+    TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
+    TWEET1_ORDER_PROMPT = get_setting('TWEET1_ORDER_PROMPT')
+    if TWEET1_ORDER_PROMPT:
+        TWEET1_ORDER_PROMPT = TWEET1_ORDER_PROMPT.split(',')
+    else:
+        TWEET1_ORDER_PROMPT = []
+    TWEET1_MAX_CHARACTER_COUNT = int(get_setting('TWEET1_MAX_CHARACTER_COUNT') or 0)
+    TWEET1_OVERLAY_URL = get_setting('TWEET1_OVERLAY_URL')
     TWEET2_SYSTEM_PROMPT = get_setting('TWEET2_SYSTEM_PROMPT')
     TWEET2_ORDER_PROMPT = get_setting('TWEET2_ORDER_PROMPT')
     if TWEET2_ORDER_PROMPT:
         TWEET2_ORDER_PROMPT = TWEET2_ORDER_PROMPT.split(',')
     else:
         TWEET2_ORDER_PROMPT = []
+    TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
+    TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
     REGENERATE_ORDER = get_setting('REGENERATE_ORDER')
     REGENERATE_COUNT = int(get_setting('REGENERATE_COUNT') or 5)
-    MAX_CHARACTER_COUNT = int(get_setting('MAX_CHARACTER_COUNT') or 0)
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
-    TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
-    order_prompt = random.choice(TWEET2_ORDER_PROMPT)  # ORDER配列からランダムに選択
-    order_prompt = order_prompt.strip()  # 先頭と末尾の改行コードを取り除く
+    tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT) 
+    tweet1_order_prompt = tweet1_order_prompt.strip()
+    tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
+    tweet2_order_prompt = tweet2_order_prompt.strip()
     if '{nowDateStr}' in order_prompt:
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
 
@@ -168,10 +179,10 @@ def get_image_with_retry(url, max_retries=3, backoff_factor=0.3):
 
 def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[]):
     r_bot_reply = bot_reply
-    print(f"initiated tweet2. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
+    print(f"initiated {tweet_no}. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
             
     if retry_count >= REGENERATE_COUNT:
-        print("tweet2 Exceeded maximum retry attempts.")
+        print(f"{tweet_no} Exceeded maximum retry attempts.")
         return
 
     # OpenAI API へのリクエスト
