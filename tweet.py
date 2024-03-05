@@ -15,7 +15,7 @@ import requests
 import tiktoken
 from PIL import Image
 
-from functions import run_conversation
+from tweet_functions import run_conversation
 
 TWEET1_API_KEY = os.getenv('TWEET2_API_KEY')
 TWEET1_API_KEY_SECRET = os.getenv('TWEET2_API_KEY_SECRET')
