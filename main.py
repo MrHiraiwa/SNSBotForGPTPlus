@@ -531,7 +531,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     extract_url = extractor.find_urls(bot_reply)
     if not extract_url:
         print(f"URL is not include doc.")
-        generate_tweet(user_id, retry_count + 1, None)
+        generate_doc(user_id, retry_count + 1, None)
         return
     return
     
