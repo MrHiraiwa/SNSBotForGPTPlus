@@ -110,7 +110,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
     'NOTE_MAX_CHARACTER_COUNT': '280',
-    'NOTE_OVERLAY_URL': ''
+    'NOTE_OVERLAY_URL': '',
     'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
@@ -120,7 +120,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
     'TWEET1_MAX_CHARACTER_COUNT': '280',
-    'TWEET1_OVERLAY_URL': ''
+    'TWEET1_OVERLAY_URL': '',
     'TWEET2': 'False',
     'TWEET2_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
@@ -130,9 +130,9 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
-    'TWEET2_OVERLAY_URL': ''
+    'TWEET2_OVERLAY_URL': '',
     'REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。URLは省略せずに文章を簡潔、あるいは省略し、文字数を減らしてツイートしてください。',
-    'REGENERATE_COUNT': '5',
+    'REGENERATE_COUNT': '5'
 }
 auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
