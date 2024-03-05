@@ -17,6 +17,10 @@ from PIL import Image
 
 from functions import run_conversation
 
+TWEET1_API_KEY = os.getenv('TWEET2_API_KEY')
+TWEET1_API_KEY_SECRET = os.getenv('TWEET2_API_KEY_SECRET')
+TWEET1_ACCESS_TOKEN = os.getenv('TWEET2_ACCESS_TOKEN')
+TWEET1_ACCESS_TOKEN_SECRET = os.getenv('TWEET2_ACCESS_TOKEN_SECRET')
 TWEET2_API_KEY = os.getenv('TWEET2_API_KEY')
 TWEET2_API_KEY_SECRET = os.getenv('TWEET2_API_KEY_SECRET')
 TWEET2_ACCESS_TOKEN = os.getenv('TWEET2_ACCESS_TOKEN')
@@ -24,24 +28,20 @@ TWEET2_ACCESS_TOKEN_SECRET = os.getenv('TWEET2_ACCESS_TOKEN_SECRET')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
 REQUIRED_ENV_VARS = [
+    "TWEET1_SYSTEM_PROMPT",
+    "TWEET1_ORDER_PROMPT",
+    "TWEET1_MAX_CHARACTER_COUNT",
+    "TWEET1_OVERLAY_URL"
     "TWEET2_SYSTEM_PROMPT",
     "TWEET2_ORDER_PROMPT",
+    "TWEET2_MAX_CHARACTER_COUNT",
+    "TWEET2_OVERLAY_URL"
     "AI_MODEL",
     "REGENERATE_ORDER",
     "REGENERATE_COUNT",
-    "MAX_CHARACTER_COUNT",
-    "TWEET2_OVERLAY_URL"
 ]
 
 DEFAULT_ENV_VARS = {
-    'TWEET2_SYSTEM_PROMPT': """
-あなたは、Twitter投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
-""",
-    'TWEET2_ORDER_PROMPT': """
-以下のツイートを英語に翻訳して、URLは翻訳せずにそのままツイートしてください。
-翻訳後の文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
-""",
-    'TWEET2_OVERLAY_URL': ''
 }
 auth = tweepy.OAuthHandler(TWEET2_API_KEY, TWEET2_API_KEY_SECRET)
 auth.set_access_token(TWEET2_ACCESS_TOKEN, TWEET2_ACCESS_TOKEN_SECRET)
