@@ -188,7 +188,7 @@ def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
         )
         image_result = response.data[0].url
         print(f"image_result: {image_result}")
-        return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。イラストを生成しました。読み込んだページの情報を元に、指示に従い日本語でツイートを生成してください。ページの情報が現在日時よりも古かった場合は終わった情報としてツイートを生成してください。ツイートの一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。![画像](https://dummy.net/dummy.jpg)", image_result
+        return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。イラストを生成しました。読み込んだページの情報を元に、指示に従い日本語で文章を生成してください。ページの情報が現在日時よりも古かった場合は終わった情報として文章を生成してください。文章の一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。![画像](https://dummy.net/dummy.jpg)", image_result
     except Exception as e:
         if "content_policy_violation" in str(e):
             return "SYSTEM: 読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", image_result
