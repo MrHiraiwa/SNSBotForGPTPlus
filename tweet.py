@@ -103,6 +103,28 @@ def get_setting(key):
         save_default_settings()
         return DEFAULT_ENV_VARS.get(key, "")
 
+def get_setting_user(user_id, key):
+    doc_ref = db.collection(u'users').document(user_id) 
+    doc = doc_ref.get()
+
+    if doc.exists:
+        doc_dict = doc.to_dict()
+        if key not in doc_dict:
+            doc_ref.set({'start_free_day': start_free_day}, merge=True)
+            return ''
+        else:
+            return doc_dict.get(key)
+    else:
+        return ''
+
+def save_default_settings():
+    doc_ref = db.collection(u'settings').document('app_settings')
+    doc_ref.set(DEFAULT_ENV_VARS, merge=True)
+
+def update_setting(key, value):
+    doc_ref = db.collection(u'settings').document('app_settings')
+    doc_ref.update({key: value})
+
 reload_settings()    
 
 def response_filter(bot_reply):
