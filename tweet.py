@@ -51,7 +51,8 @@ except Exception as e:
     raise
 
 def reload_settings():
-    global nowDate, nowDateStr, jst, AI_MODEL, TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT, DEFAULT_USER_ID
+    global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
+    global TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT, TWEET_SYSTEM_PROMPT, tweet_order_prompt, TWEET_MAX_CHARACTER_COUNT
     global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
     global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
@@ -172,6 +173,9 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
     r_bot_reply = bot_reply
     print(f"initiated {tweet_no}. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     if tweet_no == 'tweet1':
+        TWEET_SYSTEM_PROMPT = TWEET1_SYSTEM_PROMPT
+        tweet_order_prompt = tweet1_order_prompt
+        TWEET_MAX_CHARACTER_COUNT = TWEET1_MAX_CHARACTER_COUNT
         auth = tweepy.OAuthHandler(TWEET1_API_KEY, TWEET1_API_KEY_SECRET)
         auth.set_access_token(TWEET1_ACCESS_TOKEN, TWEET1_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
@@ -182,7 +186,10 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
             access_token = TWEET1_ACCESS_TOKEN,
             access_token_secret = TWEET1_ACCESS_TOKEN_SECRET
         )
-    else:            
+    else:
+        TWEET_SYSTEM_PROMPT = TWEET2_SYSTEM_PROMPT
+        tweet_order_prompt = tweet2_order_prompt
+        TWEET_MAX_CHARACTER_COUNT = TWEET2_MAX_CHARACTER_COUNT
         auth = tweepy.OAuthHandler(TWEET2_API_KEY, TWEET2_API_KEY_SECRET)
         auth.set_access_token(TWEET2_ACCESS_TOKEN, TWEET2_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
@@ -194,7 +201,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
             access_token_secret = TWEET2_ACCESS_TOKEN_SECRET
         )
             
-    if retry_count >= REGENERATE_COUNT:
+    if retry_count >= TWEET_REGENERATE_COUNT:
         print(f"{tweet_no} Exceeded maximum retry attempts.")
         return
 
