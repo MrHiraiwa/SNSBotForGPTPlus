@@ -23,7 +23,7 @@ import urllib.parse
 from PIL import Image
 
 from functions import chatgpt_functions, run_conversation
-from tweet2 import generate_tweet2
+from tweet import generate_tweet
 
 API_KEY = os.getenv('API_KEY')
 API_KEY_SECRET = os.getenv('API_KEY_SECRET')
@@ -49,10 +49,20 @@ REQUIRED_ENV_VARS = [
     "URL_FILTER_ON",
     "MAX_CHARACTER_COUNT",
     "DEFAULT_USER_ID",
-    "OVERLAY_URL",
+    "NOTE",
+    "NOTE_SYSTEM_PROMPT",
+    "NOTE_ORDER_PROMPT",
+    "NOTE_MAX_CHARACTER_COUNT",
+    "NOTE_OVERLAY_URL",
+    "TWEET1",
+    "TWEET1_SYSTEM_PROMPT",
+    "TWEET1_ORDER_PROMPT",
+    "TWEET1_MAX_CHARACTER_COUNT",
+    "TWEET1_OVERLAY_URL",
     "TWEET2",
     "TWEET2_SYSTEM_PROMPT",
     "TWEET2_ORDER_PROMPT",
+    "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_URL"
 ]
 
@@ -88,22 +98,36 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
     'MAX_TOKEN_NUM': '1500',
     'PAINTING_ON': 'True',
     'URL_FILTER_ON': 'True',
-    'MAX_CHARACTER_COUNT': '280',
     'DEFAULT_USER_ID': 'default_user_id',
-    'OVERLAY_URL': '',
-    'TWEET': 'False',
-    'TWEET_SYSTEM_PROMPT': """
+    'NOTE': 'False',
+    'NOTE_SYSTEM_PROMPT': """
+あなたは、ブログ投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
+""",
+    'NOTE_ORDER_PROMPT': """
+以下の記事をツイートしてください。
+文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
+""",
+    'NOTE_MAX_CHARACTER_COUNT': '280',
+    'NOTE_OVERLAY_URL': ''
+    'TWEET1': 'False',
+    'TWEET1_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
 """,
     'TWEET1_ORDER_PROMPT': """
 以下の記事をツイートしてください。
 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
+    'TWEET1_MAX_CHARACTER_COUNT': '280',
     'TWEET1_OVERLAY_URL': ''
+    'TWEET2': 'False',
+    'TWEET2_SYSTEM_PROMPT': """
+あなたは、Twitter投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
+""",
     'TWEET2_ORDER_PROMPT': """
 以下の記事を英語でツイートしてください。URLは翻訳せずにそのままツイートしてください。
 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
+    'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_URL': ''
     'REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。URLは省略せずに文章を簡潔、あるいは省略し、文字数を減らしてツイートしてください。',
     'REGENERATE_COUNT': '5',
@@ -128,8 +152,10 @@ except Exception as e:
     
 def reload_settings():
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, REGENERATE_ORDER, REGENERATE_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
-    global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, MAX_CHARACTER_COUNT, URL_FILTER_ON, OVERLAY_URL
-    global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_OVERLAY_URL
+    global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
+    global NOTE, NOTE_SYSTEM_PROMPT, NOTE_ORDER_PROMPT, NOTE_MAX_CHARACTER_COUNT, NOTE_OVERLAY_URL, note_order_prompt
+    global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
+    global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2NOTE_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -159,9 +185,25 @@ def reload_settings():
     MAX_TOKEN_NUM = int(get_setting('MAX_TOKEN_NUM') or 0)
     PAINTING_ON = get_setting('PAINTING_ON')
     URL_FILTER_ON = get_setting('URL_FILTER_ON')
-    MAX_CHARACTER_COUNT = int(get_setting('MAX_CHARACTER_COUNT') or 0)
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
-    OVERLAY_URL = get_setting('OVERLAY_URL')
+    NOTE = get_setting('NOTE')
+    NOTE_SYSTEM_PROMPT = get_setting('NOTE_SYSTEM_PROMPT')
+    NOTE_ORDER_PROMPT = get_setting('NOTE_ORDER_PROMPT')
+    if NOTE_ORDER_PROMPT:
+        NOTE_ORDER_PROMPT = NOTE_ORDER_PROMPT.split(',')
+    else:
+        NOTE_ORDER_PROMPT = []
+    NOTE_MAX_CHARACTER_COUNT = int(get_setting('NOTE_MAX_CHARACTER_COUNT') or 0)
+    NOTE_OVERLAY_URL = get_setting('NOTE_OVERLAY_URL')
+    TWEET1 = get_setting('TWEET1')
+    TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
+    TWEET1_ORDER_PROMPT = get_setting('TWEET1_ORDER_PROMPT')
+    if TWEET1_ORDER_PROMPT:
+        TWEET1_ORDER_PROMPT = TWEET1_ORDER_PROMPT.split(',')
+    else:
+        TWEET1_ORDER_PROMPT = []
+    TWEET1_MAX_CHARACTER_COUNT = int(get_setting('TWEET1_MAX_CHARACTER_COUNT') or 0)
+    TWEET1_OVERLAY_URL = get_setting('TWEET1_OVERLAY_URL')
     TWEET2 = get_setting('TWEET2')
     TWEET2_SYSTEM_PROMPT = get_setting('TWEET2_SYSTEM_PROMPT')
     TWEET2_ORDER_PROMPT = get_setting('TWEET2_ORDER_PROMPT')
@@ -169,11 +211,25 @@ def reload_settings():
         TWEET2_ORDER_PROMPT = TWEET2_ORDER_PROMPT.split(',')
     else:
         TWEET2_ORDER_PROMPT = []
+    TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
-    order_prompt = random.choice(ORDER_PROMPT)  # ORDER配列からランダムに選択
-    order_prompt = order_prompt.strip()  # 先頭と末尾の改行コードを取り除く
+    order_prompt = random.choice(ORDER_PROMPT)
+    order_prompt = order_prompt.strip()
+    note_order_prompt = random.choice(NOTE_ORDER_PROMPT)
+    note_order_prompt = note_order_prompt.strip() 
+    tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT)
+    tweet1_order_prompt = tweet1_order_prompt.strip() 
+    tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
+    tweet2_order_prompt = tweet2_order_prompt.strip() 
+    
     if '{nowDateStr}' in order_prompt:
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
+    if '{nowDateStr}' in note_order_prompt:
+        note_order_prompt = note_order_prompt.format(nowDateStr=nowDateStr)
+    if '{nowDateStr}' in tweet1_order_prompt:
+        tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
+    if '{nowDateStr}' in tweet2_order_prompt:
+        tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
     doc_ref = db.collection(u'settings').document('app_settings')
