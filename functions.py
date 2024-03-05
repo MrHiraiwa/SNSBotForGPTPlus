@@ -291,18 +291,18 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                 else:
                     if image_result == "" and PAINTING_ON  == 'True':
                         print("Error attempt: not image.")
-                        driver.quit()
+                        
                         return "", image_result
-                    driver.quit()
+                    
                     return response.choices[0].message.content, image_result
         else:
             print("Error attempt: not response.")
-            driver.quit()
+            
             return "", image_result
     print(f"attempt: {attempt}")
     if image_result == "":
         print("Error attempt: not image.")
-        driver.quit()
+        
         return "", image_result
-    driver.quit()
+    
     return bot_reply, image_result
