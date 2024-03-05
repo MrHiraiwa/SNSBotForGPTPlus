@@ -251,7 +251,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                     bot_reply, image_result = generate_image(arguments["prompt"], paint_prompt, user_id, PAINTING_ON)
                     i_messages_for_api.append({"role": "user", "content": bot_reply})
                     print(f"generate_image: {bot_reply}")
-                    if image_result == "":
+                    if image_result == ""and PAINTING_ON == 'True':
                         generate_image_called = False
                     attempt += 1
                 elif function_call.name == "scraping" and not scraping_called:
