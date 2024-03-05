@@ -37,22 +37,11 @@ REQUIRED_ENV_VARS = [
     "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_URL"
     "AI_MODEL",
-    "REGENERATE_ORDER",
-    "REGENERATE_COUNT",
+    "TWEET_REGENERATE_ORDER",
+    "TWEET_REGENERATE_COUNT",
 ]
 
 DEFAULT_ENV_VARS = {
-}
-auth = tweepy.OAuthHandler(TWEET2_API_KEY, TWEET2_API_KEY_SECRET)
-auth.set_access_token(TWEET2_ACCESS_TOKEN, TWEET2_ACCESS_TOKEN_SECRET)
-api = tweepy.API(auth)
-
-client = tweepy.Client(
-    consumer_key = TWEET2_API_KEY,
-    consumer_secret = TWEET2_API_KEY_SECRET,
-    access_token = TWEET2_ACCESS_TOKEN,
-    access_token_secret = TWEET2_ACCESS_TOKEN_SECRET
-)
 
 # Firestore クライアントの初期化
 try:
@@ -62,7 +51,7 @@ except Exception as e:
     raise
 
 def reload_settings():
-    global nowDate, nowDateStr, jst, AI_MODEL, REGENERATE_ORDER, REGENERATE_COUNT, DEFAULT_USER_ID
+    global nowDate, nowDateStr, jst, AI_MODEL, TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT, DEFAULT_USER_ID
     global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
     global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
@@ -86,15 +75,17 @@ def reload_settings():
         TWEET2_ORDER_PROMPT = []
     TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
-    REGENERATE_ORDER = get_setting('REGENERATE_ORDER')
-    REGENERATE_COUNT = int(get_setting('REGENERATE_COUNT') or 5)
+    TWEET_REGENERATE_ORDER = get_setting('TWEET_REGENERATE_ORDER')
+    TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
     tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT) 
     tweet1_order_prompt = tweet1_order_prompt.strip()
     tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
     tweet2_order_prompt = tweet2_order_prompt.strip()
-    if '{nowDateStr}' in order_prompt:
-        order_prompt = order_prompt.format(nowDateStr=nowDateStr)
+    if '{nowDateStr}' in tweet1_order_prompt:
+        tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
+    if '{nowDateStr}' in tweet2_order_prompt:
+        tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
     doc_ref = db.collection(u'settings').document('app_settings')
@@ -180,6 +171,28 @@ def get_image_with_retry(url, max_retries=3, backoff_factor=0.3):
 def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[]):
     r_bot_reply = bot_reply
     print(f"initiated {tweet_no}. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
+    if tweet_no == 'tweet1':
+        auth = tweepy.OAuthHandler(TWEET1_API_KEY, TWEET1_API_KEY_SECRET)
+        auth.set_access_token(TWEET1_ACCESS_TOKEN, TWEET1_ACCESS_TOKEN_SECRET)
+        api = tweepy.API(auth)
+
+        client = tweepy.Client(
+            consumer_key = TWEET1_API_KEY,
+            consumer_secret = TWEET1_API_KEY_SECRET,
+            access_token = TWEET1_ACCESS_TOKEN,
+            access_token_secret = TWEET1_ACCESS_TOKEN_SECRET
+        )
+    else:            
+        auth = tweepy.OAuthHandler(TWEET2_API_KEY, TWEET2_API_KEY_SECRET)
+        auth.set_access_token(TWEET2_ACCESS_TOKEN, TWEET2_ACCESS_TOKEN_SECRET)
+        api = tweepy.API(auth)
+
+        client = tweepy.Client(
+            consumer_key = TWEET2_API_KEY,
+            consumer_secret = TWEET2_API_KEY_SECRET,
+            access_token = TWEET2_ACCESS_TOKEN,
+            access_token_secret = TWEET2_ACCESS_TOKEN_SECRET
+        )
             
     if retry_count >= REGENERATE_COUNT:
         print(f"{tweet_no} Exceeded maximum retry attempts.")
@@ -187,14 +200,14 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
 
     # OpenAI API へのリクエスト
     messages_for_api = [
-        {'role': 'system', 'content': TWEET2_SYSTEM_PROMPT}
+        {'role': 'system', 'content': TWEET_SYSTEM_PROMPT}
     ]
     
     if retry_count == 0:    
-        messages_for_api.append({'role': 'user', 'content': order_prompt + "\n" + bot_reply})
+        messages_for_api.append({'role': 'user', 'content': tweet_order_prompt + "\n" + bot_reply})
     else:
         # Retry
-        messages_for_api.append({'role': 'user', 'content': REGENERATE_ORDER + "\n" + bot_reply})
+        messages_for_api.append({'role': 'user', 'content': TWEET_REGENERATE_ORDER + "\n" + bot_reply})
     
     print(f"tweet2 initiate re run_conversation. messages_for_api: {messages_for_api}")
     response = run_conversation(AI_MODEL, messages_for_api)
@@ -215,11 +228,12 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         generate_tweet(tweet_no, user_id, r_bot_reply, retry_count + 1, public_img_url)
         return
         
-    if 1 <= character_count <= MAX_CHARACTER_COUNT:
+    if 1 <= character_count <= TWEET_MAX_CHARACTER_COUNT:
+            
         if public_img_url:
             # Download image from URL
             base_img = get_image_with_retry(public_img_url)
-            overlay_img = get_image_with_retry(TWEET2_OVERLAY_URL)
+            overlay_img = get_image_with_retry(TWEET_OVERLAY_URL)
             combined_img = overlay_transparent_image(base_img, overlay_img)
             # オーバーレイされた画像をアップロード
             img_data = BytesIO()
