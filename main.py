@@ -59,21 +59,21 @@ REQUIRED_ENV_VARS = [
 DEFAULT_ENV_VARS = {
     'AI_MODEL': 'gpt-3.5-turbo-0125',
     'SYSTEM_PROMPT': """
-あなたは、Twitter投稿者です。あなたはURLからURLリストを読み込んだりページのの内容を読み込んだりできます。
+あなたは、ブログ投稿者です。あなたはURLからURLリストを読み込んだりページのの内容を読み込んだりできます。
 下記の条件に従ってツイートしてください。
 条件:
 -小学生にもわかりやすく書いてください。
 -出力文 は女性を思わせる口語体で記述してください。
--文脈に応じて、任意の場所で絵文字を使ってください。ツイートする文字数はURLを除いて117文字以内にしてください。
--ニュースに対して記者の視点やニュースの当事者ではなく、ニュースを読んだ読者視点で感想をツイートしてください。
--冒頭に「選んだ」「検索した」等の記載は不要です。ニュースだけを短く簡潔に書いてください。
--ツイート内の文章で、「描いたイラスト」「イラストにした」「イメージした」「イラスト完成」等、生成したイラストについて言及しないでください。
--記事に合った画像を生成してください。ツイートに画像のURLは付与しないでください。
-ツイートの一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。
+-文脈に応じて、任意の場所で絵文字を使ってください。
+-読み込んだ記事に対して記者の視点や記事の当事者ではなく、記事を読んだ読者視点で感想を生成してください。
+-冒頭に「選んだ」「検索した」等の記載は不要です。記事をなるべく長い感想文にしてください。
+-生成した文章で、「描いたイラスト」「イラストにした」「イメージした」「イラスト完成」等、生成したイラストについて言及しないでください。
+-記事に合った画像を生成してください。
+文章の一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。
 """,
     'ORDER_PROMPT': """
 現在は日本時間の{nowDateStr}です。
-検索は行わずに次のURLからURLのリストを読み込んで一番上のニュースを選び、URLのページを読み込んでから条件に従ってツイートしてください。一番上のニュースが前回のツイートの内容に近い内容であった場合は次のニュースを選択してください。
+次のURLからURLのリストを読み込んで一番上の記事を選び、URLのページを読み込んでから条件に従って文章を生成してください。一番上の記事が前回の記事の内容に近い内容であった場合は次の記事を選択してください。
 https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'PAINT_PROMPT': """
@@ -81,8 +81,6 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 日本人向けの画風にしてください。
 日本の萌えアニメ風イラストの全体に脈動感を持たせてください。登場人物は向きや姿勢を変えるなどして脈動感を与えてください。
 """,
-    'REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。URLは省略せずに文章を簡潔、あるいは省略し、文字数を減らしてツイートしてください。',
-    'REGENERATE_COUNT': '5',
     'PARTIAL_MATCH_FILTER_WORDS': 'google.com,google.co.jp,www.iwate-np.co.jp,fashion-press.net,prtimes.jp,designlearn.co.jp,www.goal.com', 
     'FULL_MATCH_FILTER_WORDS': '最新ブラウザ,gamebiz【ゲームビズ】,PR TIMES,日テレNEWS NNN,産経ニュース,ナゾロジー,日経メディカル,朝日新聞デジタル,NHKニュース,KBC九州朝日放送,北海道新聞,EE Times Japan,下野新聞社,ファミ通App,株探（かぶたん）,スポーツナビ,電撃ホビーウェブ,スポーツナビ,マテリアルフロー･プラス,Yahoo!ニュース,ライブドアニュース,日本経済新聞,Kufura,スポーツ報知,日本農業新聞,4Gamer,日刊スポーツ,tnc.co.jp,日刊スポーツ,広島ホームテレビ,au Webポータル,ファミ通,スポニチ Sponichi Annex,トラベル Watch,朝日新聞GLOBE＋,ペルソナチャンネル,読売新聞オンライン,静岡新聞,中国新聞デジタル,TBS NEWS DIG,秋田魁新報,GAME Watch,ロイター,毎日新聞,ナタリー,HOBBY Watch,goo ニュース,ハフポスト,Nordot,くるまのニュース,ORICON NEWS,ITmedia,サンスポ,hobby Watch,デイリースポーツ,TBSテレビ,楽天ブログ,Billboard JAPAN,AV Watch,NHK,神戸新聞,Forbes JAPAN,Bloomberg.co.jp,西宮市,Elle,Natalie',
     'READ_TEXT_COUNT': '1500',
@@ -93,15 +91,22 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
     'MAX_CHARACTER_COUNT': '280',
     'DEFAULT_USER_ID': 'default_user_id',
     'OVERLAY_URL': '',
-    'TWEET2': 'False',
-    'TWEET2_SYSTEM_PROMPT': """
+    'TWEET': 'False',
+    'TWEET_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
 """,
+    'TWEET1_ORDER_PROMPT': """
+以下の記事をツイートしてください。
+文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
+""",
+    'TWEET1_OVERLAY_URL': ''
     'TWEET2_ORDER_PROMPT': """
-以下のツイートを英語に翻訳して、URLは翻訳せずにそのままツイートしてください。
-翻訳後の文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
+以下の記事を英語でツイートしてください。URLは翻訳せずにそのままツイートしてください。
+文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
     'TWEET2_OVERLAY_URL': ''
+    'REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。URLは省略せずに文章を簡潔、あるいは省略し、文字数を減らしてツイートしてください。',
+    'REGENERATE_COUNT': '5',
 }
 auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
