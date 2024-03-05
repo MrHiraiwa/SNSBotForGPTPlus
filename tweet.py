@@ -216,15 +216,15 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         # Retry
         messages_for_api.append({'role': 'user', 'content': TWEET_REGENERATE_ORDER + "\n" + bot_reply})
     
-    print(f"tweet2 initiate re run_conversation. messages_for_api: {messages_for_api}")
+    print(f"{tweet_no} initiate re run_conversation. messages_for_api: {messages_for_api}")
     response = run_conversation(AI_MODEL, messages_for_api)
     bot_reply = response.choices[0].message.content
     print(f"before filtered bot_reply: {bot_reply}")
     bot_reply = response_filter(bot_reply)
         
-    print(f"tweet2 bot_reply: {bot_reply}, public_img_url: {public_img_url}")
+    print(f"{tweet_no} bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     character_count = int(parse_tweet(bot_reply).weightedLength)
-    print(f"tweet2 character_count: {character_count}")
+    print(f"{tweet_no} character_count: {character_count}")
     extract_url = extract_urls_with_indices(bot_reply)
 
     if extract_url:
@@ -249,11 +249,11 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
             media = api.media_upload(filename='image.png', file=img_data)
             # Tweet with image
             response = client.create_tweet(text=bot_reply, media_ids=[media.media_id])
-            print(f"tweet2 response : {response} and image")
+            print(f"{tweet_no} response : {response} and image")
         else:
             response = client.create_tweet(text = bot_reply)
-            print(f"final tweet2 response : {response}")
+            print(f"final {tweet_no} response : {response}")
     else:
-        print(f"character_count is {character_count}. tweet2 is retrying...")
+        print(f"character_count is {character_count}. {tweet_no} is retrying...")
         generate_tweet(tweet_no, user_id, bot_reply, retry_count + 1, public_img_url)
     return
