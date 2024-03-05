@@ -175,7 +175,7 @@ def scraping(url, read_text_count, user_id):
 def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
     image_result = ""
     if PAINTING_ON  == 'False':
-        return "SYSTEM: 読み込んだページの情報を元に、指示に従い日本語で文章を生成してください。ページの情報が現在日時よりも古かった場合は終わった情報として文章を生成してください。文章の一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。", image_result
+        return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。イラストを生成しました。読み込んだページの情報を元に、指示に従い日本語で文章を生成してください。ページの情報が現在日時よりも古かった場合は終わった情報として文章を生成してください。文章の一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。![画像](https://dummy.net/dummy.jpg)", image_result
     i_prompt = prompt + "\n" + paint_prompt
     print(f"generate_image prompt:{prompt}")
     try:
