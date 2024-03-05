@@ -506,22 +506,22 @@ def get_image_with_retry(url, max_retries=3, backoff_factor=0.3):
         return None
 
 
-@app.route('/tweet')
-def create_tweet():
+@app.route('/create')
+def create():
     reload_settings()
     
     user_id = DEFAULT_USER_ID
     
-    future = executor.submit(generate_tweet, user_id, 0, None)  # Futureオブジェクトを受け取ります
+    future = executor.submit(generate_doc, user_id, 0, None)  # Futureオブジェクトを受け取ります
     try:
         future.result()
     except Exception as e:
         print(f"Error: {e}")  # エラーメッセージを表示します
-        return jsonify({"status": "Tweet creation started"}), 200
-    return jsonify({"status": "Tweet creation started"}), 200
+        return jsonify({"status": "Creation started"}), 200
+    return jsonify({"status": "Creation started"}), 200
 
-def generate_tweet(user_id, retry_count, bot_reply, r_public_img_url=[]):
-    print(f"initiated tweet. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, r_public_img_url: {r_public_img_url}")
+def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
+    print(f"initiated doc. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, r_public_img_url: {r_public_img_url}")
     doc_ref = db.collection(u'users').document(user_id)
     print(f"Firestore document reference obtained {doc_ref}")
             
@@ -597,59 +597,6 @@ def generate_tweet(user_id, retry_count, bot_reply, r_public_img_url=[]):
         print(f"URL is not include tweet.")
         generate_tweet(user_id, retry_count + 1, None)
         return
-        
-    if 1 <= character_count <= MAX_CHARACTER_COUNT:
-            
-        try:
-            if public_img_url:
-                # Download image from URL
-                base_img = get_image_with_retry(public_img_url)
-                overlay_img = get_image_with_retry(OVERLAY_URL)
-                combined_img = overlay_transparent_image(base_img, overlay_img)
-                # オーバーレイされた画像をアップロード
-                img_data = BytesIO()
-                combined_img.save(img_data, format='PNG')
-                img_data.seek(0)
-                media = api.media_upload(filename='image.png', file=img_data)
-                # Tweet with image
-                response = client.create_tweet(text=bot_reply, media_ids=[media.media_id])
-                print(f"response : {response} and image")
-            else:
-                response = client.create_tweet(text = bot_reply)
-                print(f"final response : {response}")
-
-            user_data = prune_old_messages(user_data, MAX_TOKEN_NUM)
-            
-            if URL_FILTER_ON == 'True':
-                if extract_url:
-                    print(f"extract_url:{extract_url}")
-                    extracted_url = extract_url[0]['url']
-                    add_url_to_firestore(extracted_url, user_id)
-        
-                delete_expired_urls('user_id')
-            print(f"user_data: {user_data}")
-            
-            # ユーザー(order_prompt)とボットのメッセージを暗号化してFirestoreに保存
-            # order_promptの保存は不要と判断しコメントアウト
-            # user_data['messages'].append({'role': 'user', 'content': get_encrypted_message(order_prompt, hashed_secret_key)})
-            user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})         
-            user_data['daily_usage'] = daily_usage
-            user_data['updated_date'] = nowDate
-            user_data['last_image_url'] = public_img_url
-            doc_ref.set(user_data, merge=True)
-            print(f"save user doc. user ID: {user_id}")
-            if TWEET2 == 'True':
-                generate_tweet2(user_id, bot_reply, 0, public_img_url)
-            
-        except tweepy.TooManyRequests as e:  # TooManyRequests例外をキャッチ
-            reset_time = e.response.json()['resources']['search']['/search/tweets']['reset']
-            reset_datetime = datetime.fromtimestamp(reset_time)
-            print(f"Rate limit will reset at: {reset_datetime}")
-        except tweepy.TweepyException as e:
-            print(f"An error occurred: {e}")
-    else:
-        print(f"character_count is {character_count} retrying...")
-        generate_tweet(user_id, retry_count + 1, bot_reply, public_img_url)
     return
     
 if __name__ == "__main__":
