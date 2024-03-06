@@ -197,7 +197,6 @@ def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
         return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", image_result
 
 def run_conversation(GPT_MODEL, messages):
-    driver.quit()
     try:
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
