@@ -548,7 +548,8 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         if extract_url:
             print(f"extract_url: {extract_url}")
             # リストの最初のURLをエンコードする
-            encoded_url = quote(extract_url[0])
+            #encoded_url = quote(extract_url[0])
+            encoded_url = extract_url[0]
             add_url_to_firestore(encoded_url, user_id)
         
         delete_expired_urls('user_id')
