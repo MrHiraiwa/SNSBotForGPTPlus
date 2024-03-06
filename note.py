@@ -12,11 +12,13 @@ from requests.packages.urllib3.util.retry import Retry
 import requests
 import tiktoken
 from PIL import Image
+from Note_Client import Note
 
 from note_functions import run_conversation
 
-NOTE_USERNAME = os.getenv('NOTE_USERNAME')
+NOTE_USERNAME = os.getenv('NOTE_EMAIL')
 NOTE_PASSWRD = os.getenv('NOTE_PASSWRD')
+NOTE_PASSWRD = os.getenv('NOTE_USERID')
 
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
@@ -28,6 +30,15 @@ REQUIRED_ENV_VARS = [
 ]
 
 DEFAULT_ENV_VARS = {}
+
+EMAIL = 'your email'
+PASSWORD = 'your password'
+USER_ID = 'your user_id'
+
+TITLE = 'Sample'
+CONTENT_PATH = 'content.txt'
+TAG_LIST = ['sample_tag']
+
 
 # Firestore クライアントの初期化
 try:
@@ -156,9 +167,9 @@ def generate_note(user_id, bot_reply, public_img_url=[]):
         img_data.seek(0)
         media = api.media_upload(filename='image.png', file=img_data)
         # note with image
-        xxxxx
-        print(f"note bot_reply : {bot_reply} and image")
+        note = Note(email=NOTE_EMAIL, password=NOTE_PASSWORD, user_id=NOTE_USERID)
+        print(note.create_article(title=TITLE, file_name=CONTENT_PATH, input_tag_list=TAG_LIST))
     else:
-        xxxxx
-        print(f"final note bot_reply : {bot_reply}")
+        note = Note(email=NOTE_EMAIL, password=NOTE_PASSWORD, user_id=NOTE_USERID)
+        print(note.create_article(title=TITLE, file_name=CONTENT_PATH, input_tag_list=TAG_LIST))
     return
