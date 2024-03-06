@@ -31,14 +31,14 @@ REQUIRED_ENV_VARS = [
     "TWEET1_SYSTEM_PROMPT",
     "TWEET1_ORDER_PROMPT",
     "TWEET1_MAX_CHARACTER_COUNT",
-    "TWEET1_OVERLAY_URL"
+    "TWEET1_OVERLAY_URL",
+    "TWEET1_REGENERATE_ORDER",
     "TWEET2_SYSTEM_PROMPT",
     "TWEET2_ORDER_PROMPT",
     "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_URL"
+    "TWEET2_REGENERATE_ORDER",
     "AI_MODEL",
-    "TWEET_REGENERATE_ORDER",
-    "TWEET_REGENERATE_COUNT",
 ]
 
 DEFAULT_ENV_VARS = {}
@@ -52,9 +52,9 @@ except Exception as e:
 
 def reload_settings():
     global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
-    global TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT, tweet_system_prompt, tweet_order_prompt, tweet_max_character_count, tweet_overlay_url
-    global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
-    global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
+    global tweet_regenerate_order, TWEET_REGENERATE_COUNT, tweet_system_prompt, tweet_order_prompt, tweet_max_character_count, tweet_overlay_url
+    global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, TWEET1_REGENERATE_ORDER, tweet1_order_prompt
+    global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, TWEET2_REGENERATE_ORDER, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -68,6 +68,7 @@ def reload_settings():
         TWEET1_ORDER_PROMPT = []
     TWEET1_MAX_CHARACTER_COUNT = int(get_setting('TWEET1_MAX_CHARACTER_COUNT') or 0)
     TWEET1_OVERLAY_URL = get_setting('TWEET1_OVERLAY_URL')
+    TWEET1_REGENERATE_ORDER = get_setting('TWEET1_REGENERATE_ORDER')
     TWEET2_SYSTEM_PROMPT = get_setting('TWEET2_SYSTEM_PROMPT')
     TWEET2_ORDER_PROMPT = get_setting('TWEET2_ORDER_PROMPT')
     if TWEET2_ORDER_PROMPT:
@@ -76,7 +77,7 @@ def reload_settings():
         TWEET2_ORDER_PROMPT = []
     TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
-    TWEET_REGENERATE_ORDER = get_setting('TWEET_REGENERATE_ORDER')
+    TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
     tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT) 
@@ -240,6 +241,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         tweet_order_prompt = tweet1_order_prompt
         tweet_max_character_count = TWEET1_MAX_CHARACTER_COUNT
         tweet_overlay_url = TWEET1_OVERLAY_URL
+        tweet_regenerate_order = get_setting('TWEET1_REGENERATE_ORDER')
         auth = tweepy.OAuthHandler(TWEET1_API_KEY, TWEET1_API_KEY_SECRET)
         auth.set_access_token(TWEET1_ACCESS_TOKEN, TWEET1_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
@@ -255,6 +257,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         tweet_order_prompt = tweet2_order_prompt
         tweet_max_character_count = TWEET2_MAX_CHARACTER_COUNT
         tweet_overlay_url = TWEET2_OVERLAY_URL
+        tweet_regenerate_order = get_setting('TWEET2_REGENERATE_ORDER')
         auth = tweepy.OAuthHandler(TWEET2_API_KEY, TWEET2_API_KEY_SECRET)
         auth.set_access_token(TWEET2_ACCESS_TOKEN, TWEET2_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
@@ -279,7 +282,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         messages_for_api.append({'role': 'user', 'content': tweet_order_prompt + "\n" + bot_reply})
     else:
         # Retry
-        messages_for_api.append({'role': 'user', 'content': TWEET_REGENERATE_ORDER + "\n" + bot_reply})
+        messages_for_api.append({'role': 'user', 'content': tweet_regenerate_order + "\n" + bot_reply})
     
     print(f"{tweet_no} initiate re run_conversation. messages_for_api: {messages_for_api}")
     response = run_conversation(AI_MODEL, messages_for_api)
