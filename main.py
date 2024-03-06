@@ -501,9 +501,6 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
             'start_free_day': datetime.now(jst),
             'last_image_url': ""
         }
-    if retry_count >= REGENERATE_COUNT:
-        print("Exceeded maximum retry attempts.")
-        return
 
     # OpenAI API へのリクエスト
     messages_for_api = [
