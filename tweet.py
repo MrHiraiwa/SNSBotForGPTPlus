@@ -172,6 +172,7 @@ def response_filter(bot_reply):
     pattern207 = r"Reference:"
     pattern208 = r"Source:"
     pattern209 = r"Learn more! 👉"
+    pattern210 = r"Learn more:"
 
     # パターンに基づいてテキストをフィルタリング
     bot_reply = re.sub(pattern101, r" \1", bot_reply).strip()
@@ -213,6 +214,7 @@ def response_filter(bot_reply):
     bot_reply = re.sub(pattern207, " ", bot_reply).strip()
     bot_reply = re.sub(pattern208, " ", bot_reply).strip()
     bot_reply = re.sub(pattern209, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern210, " ", bot_reply).strip()
     response = re.sub(r"\n{2,}", "\n", bot_reply)
 
     return response.rstrip('\n')
