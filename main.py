@@ -541,7 +541,25 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
     if TWEET2 == 'True':
         generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
-    
+        
+    if URL_FILTER_ON == 'True':
+        if extract_url:
+            print(f"extract_url:{extract_url}")
+            extracted_url = extract_url[0]['url']
+            add_url_to_firestore(extracted_url, user_id)
+        
+        delete_expired_urls('user_id')
+    print(f"user_data: {user_data}")
+            
+    # ユーザー(order_prompt)とボットのメッセージを暗号化してFirestoreに保存
+    # order_promptの保存は不要と判断しコメントアウト
+    # user_data['messages'].append({'role': 'user', 'content': get_encrypted_message(order_prompt, hashed_secret_key)})
+    user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})         
+    user_data['daily_usage'] = daily_usage
+    user_data['updated_date'] = nowDate
+    user_data['last_image_url'] = public_img_url
+    doc_ref.set(user_data, merge=True)
+    print(f"save user doc. user ID: {user_id}")
     return
     
 if __name__ == "__main__":
