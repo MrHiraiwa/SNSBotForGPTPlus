@@ -212,7 +212,7 @@ def reload_settings():
     NOTE_MAX_CHARACTER_COUNT = int(get_setting('NOTE_MAX_CHARACTER_COUNT') or 0)
     NOTE_OVERLAY_URL = get_setting('NOTE_OVERLAY_URL')
     TWEET_REGENERATE_ORDER = get_setting('REGENERATE_ORDER')
-    TWEET_REGENERATE_COUNT = int(get_setting('REGENERATE_COUNT') or 5)
+    TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     TWEET1 = get_setting('TWEET1')
     TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
     TWEET1_ORDER_PROMPT = get_setting('TWEET1_ORDER_PROMPT')
