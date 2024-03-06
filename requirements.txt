@@ -16,3 +16,5 @@ webdriver_manager
 beautifulsoup4
 pycryptodome
 Pillow
+NoteClient
+urlextract
