@@ -119,7 +119,7 @@ input[type="button"] {
   {% for key in required_env_vars %}
     <div>
       <label for="{{ key }}">{{ key }}</label>
-        {% if key == "SYSTEM_PROMPT" or key == "ORDER_PROMPT" or key == "PAINT_PROMPT" or key == "TWEET2_SYSTEM_PROMPT" or key == "TWEET2_ORDER_PROMPT" %}
+        {% if key == "SYSTEM_PROMPT" or key == "ORDER_PROMPT" or key == "PAINT_PROMPT" or key == "NOTE_SYSTEM_PROMPT" or key == "NOTE_ORDER_PROMPT"or key == "TWEET1_SYSTEM_PROMPT" or key == "TWEET1_ORDER_PROMPT"or key == "TWEET2_SYSTEM_PROMPT" or key == "TWEET2_ORDER_PROMPT" %}
         <textarea id="{{ key }}" name="{{ key }}" oninput="adjustHeight(this)">{{ settings[key] or '' }}</textarea>
       {% else %}
         <input type="text" id="{{ key }}" name="{{ key }}" value="{{ settings[key] or '' }}">
