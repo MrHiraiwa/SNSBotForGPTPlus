@@ -167,6 +167,8 @@ def response_filter(bot_reply):
     pattern204 = r"More info:"
     pattern205 = r"Tweeted with full URL:"
     pattern206 = r"Read more:"
+    pattern207 = r"Reference:"
+    pattern208 = r"Source:"
 
     # パターンに基づいてテキストをフィルタリング
     bot_reply = re.sub(pattern102, "", bot_reply).strip()
@@ -204,6 +206,8 @@ def response_filter(bot_reply):
     bot_reply = re.sub(pattern204, " ", bot_reply).strip()
     bot_reply = re.sub(pattern205, " ", bot_reply).strip()
     bot_reply = re.sub(pattern206, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern207, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern208, " ", bot_reply).strip()
     response = re.sub(r"\n{2,}", "\n", bot_reply)
 
     return response.rstrip('\n')
