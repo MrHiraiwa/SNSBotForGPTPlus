@@ -18,7 +18,7 @@ from flask_executor import Executor
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 import tiktoken
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote_from_bytes
 import urllib.parse
 from PIL import Image
 from urlextract import URLExtract
@@ -545,6 +545,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     if URL_FILTER_ON == 'True':
         if extract_url:
             print(f"extract_url:{extract_url}")
+            extract_url = quote_from_bytes(extract_url.encode('utf-8'))
             add_url_to_firestore(extract_url, user_id)
         
         delete_expired_urls('user_id')
