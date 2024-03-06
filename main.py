@@ -545,7 +545,6 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     if URL_FILTER_ON == 'True':
         if extract_url:
             print(f"extract_url:{extract_url}")
-            extracted_url = extract_url[0]['url']
             add_url_to_firestore(extracted_url, user_id)
         
         delete_expired_urls('user_id')
