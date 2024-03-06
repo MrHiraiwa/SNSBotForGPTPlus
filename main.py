@@ -473,6 +473,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     updated_date = nowDate
     daily_usage = 0
     public_img_url = []
+    removed_assistant_messages = []
     if user_doc.exists:
         print(f"already exist user doc.  user ID: {user_id}")
         user_data = user_doc.to_dict()
@@ -500,9 +501,10 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     ]
     for msg in user_data['messages']:
         decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
-        messages_for_api.append({'role': msg['role'], 'content': decrypted_content}) 
-      
-        messages_for_api.append({'role': 'user', 'content': order_prompt})
+        messages_for_api.append({'role': msg['role'], 'content': decrypted_content})
+        
+    # この行はループの外で一度だけ行う
+    messages_for_api.append({'role': 'user', 'content': order_prompt})
 
     # 各メッセージのエンコードされた文字数を合計
     total_chars = sum([len(encoding.encode(msg['content'])) for msg in messages_for_api])
@@ -511,6 +513,9 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     while total_chars > MAX_TOKEN_NUM and len(messages_for_api) > 3:
         removed_message = messages_for_api.pop(3)  # 最初の3つはシステムとアシスタントのメッセージなので保持
         total_chars -= len(encoding.encode(removed_message['content']))
+        # もし削除されたメッセージがassistantのものなら、一時リストに追加
+        if removed_message['role'] == 'assistant':
+            removed_assistant_messages.append(removed_message)
     if bot_reply is None:
         bot_reply, public_img_url = chatgpt_functions(AI_MODEL, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
         if bot_reply == "":
@@ -551,10 +556,14 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         delete_expired_urls('user_id')
     print(f"user_data: {user_data}")
             
-    # ユーザー(order_prompt)とボットのメッセージを暗号化してFirestoreに保存
-    # order_promptの保存は不要と判断しコメントアウト
-    # user_data['messages'].append({'role': 'user', 'content': get_encrypted_message(order_prompt, hashed_secret_key)})
-    user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})         
+    # ユーザーデータにremoved_assistant_messagesを再追加
+    if removed_assistant_messages:
+        # 保存されたassistantメッセージをFirestoreに戻す
+        for msg in removed_assistant_messages:
+            # メッセージを暗号化して保存
+            encrypted_message = get_encrypted_message(msg['content'], hashed_secret_key)
+            user_data['messages'].insert(0, {'role': 'assistant', 'content': encrypted_message}) 
+   
     user_data['daily_usage'] = daily_usage
     user_data['updated_date'] = nowDate
     user_data['last_image_url'] = public_img_url
