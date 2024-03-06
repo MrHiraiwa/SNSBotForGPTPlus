@@ -52,7 +52,7 @@ except Exception as e:
 
 def reload_settings():
     global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
-    global TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT, TWEET_SYSTEM_PROMPT, tweet_order_prompt, TWEET_MAX_CHARACTER_COUNT
+    global TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT, tweet_system_prompt, tweet_order_prompt, tweet_max_character_count, tweet_overlay_url
     global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
     global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
@@ -234,9 +234,10 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
     r_bot_reply = bot_reply
     print(f"initiated {tweet_no}. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     if tweet_no == 'tweet1':
-        TWEET_SYSTEM_PROMPT = TWEET1_SYSTEM_PROMPT
+        tweet_system_prompt = TWEET1_SYSTEM_PROMPT
         tweet_order_prompt = tweet1_order_prompt
-        TWEET_MAX_CHARACTER_COUNT = TWEET1_MAX_CHARACTER_COUNT
+        tweet_max_character_count = TWEET1_MAX_CHARACTER_COUNT
+        tweet_overlay_url = TWEET1_OVERLAY_URL
         auth = tweepy.OAuthHandler(TWEET1_API_KEY, TWEET1_API_KEY_SECRET)
         auth.set_access_token(TWEET1_ACCESS_TOKEN, TWEET1_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
@@ -248,9 +249,10 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
             access_token_secret = TWEET1_ACCESS_TOKEN_SECRET
         )
     else:
-        TWEET_SYSTEM_PROMPT = TWEET2_SYSTEM_PROMPT
+        tweet_system_prompt = TWEET2_SYSTEM_PROMPT
         tweet_order_prompt = tweet2_order_prompt
-        TWEET_MAX_CHARACTER_COUNT = TWEET2_MAX_CHARACTER_COUNT
+        tweet_max_character_count = TWEET2_MAX_CHARACTER_COUNT
+        tweet_overlay_url = TWEET2_OVERLAY_URL
         auth = tweepy.OAuthHandler(TWEET2_API_KEY, TWEET2_API_KEY_SECRET)
         auth.set_access_token(TWEET2_ACCESS_TOKEN, TWEET2_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
@@ -268,7 +270,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
 
     # OpenAI API へのリクエスト
     messages_for_api = [
-        {'role': 'system', 'content': TWEET_SYSTEM_PROMPT}
+        {'role': 'system', 'content': tweet_system_prompt}
     ]
     
     if retry_count == 0:    
@@ -296,12 +298,12 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         generate_tweet(tweet_no, user_id, r_bot_reply, retry_count + 1, public_img_url)
         return
         
-    if 1 <= character_count <= TWEET_MAX_CHARACTER_COUNT:
+    if 1 <= character_count <= tweet_max_character_count:
             
         if public_img_url:
             # Download image from URL
             base_img = get_image_with_retry(public_img_url)
-            overlay_img = get_image_with_retry(TWEET_OVERLAY_URL)
+            overlay_img = get_image_with_retry(tweet_overlay_url)
             combined_img = overlay_transparent_image(base_img, overlay_img)
             # オーバーレイされた画像をアップロード
             img_data = BytesIO()
