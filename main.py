@@ -65,7 +65,7 @@ REQUIRED_ENV_VARS = [
     "TWEET2_ORDER_PROMPT",
     "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_URL",
-    "TWEET1_REGENERATE_ORDER"
+    "TWEET2_REGENERATE_ORDER"
 ]
 
 DEFAULT_ENV_VARS = {
@@ -148,7 +148,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_URL': '',
-    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。'
+    'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。'
 }
 
 # Firestore クライアントの初期化
@@ -501,12 +501,8 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     for msg in user_data['messages']:
         decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
         messages_for_api.append({'role': msg['role'], 'content': decrypted_content}) 
-    
-    if bot_reply is None:    
+      
         messages_for_api.append({'role': 'user', 'content': order_prompt})
-    else:
-        # Retry
-        messages_for_api.append({'role': 'user', 'content': REGENERATE_ORDER + "\n" + bot_reply})
 
     # 各メッセージのエンコードされた文字数を合計
     total_chars = sum([len(encoding.encode(msg['content'])) for msg in messages_for_api])
