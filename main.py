@@ -54,18 +54,19 @@ REQUIRED_ENV_VARS = [
     "NOTE_ORDER_PROMPT",
     "NOTE_MAX_CHARACTER_COUNT",
     "NOTE_OVERLAY_URL",
-    "TWEET_REGENERATE_ORDER",
     "TWEET_REGENERATE_COUNT",
     "TWEET1",
     "TWEET1_SYSTEM_PROMPT",
     "TWEET1_ORDER_PROMPT",
     "TWEET1_MAX_CHARACTER_COUNT",
     "TWEET1_OVERLAY_URL",
+    "TWEET1_REGENERATE_ORDER",
     "TWEET2",
     "TWEET2_SYSTEM_PROMPT",
     "TWEET2_ORDER_PROMPT",
     "TWEET2_MAX_CHARACTER_COUNT",
-    "TWEET2_OVERLAY_URL"
+    "TWEET2_OVERLAY_URL",
+    "TWEET1_REGENERATE_ORDER"
 ]
 
 DEFAULT_ENV_VARS = {
@@ -111,7 +112,6 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'NOTE_MAX_CHARACTER_COUNT': '280',
     'NOTE_OVERLAY_URL': '',
-    'TWEET_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。URLは省略しないでください。',
     'TWEET_REGENERATE_COUNT': '5',
     'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
@@ -130,6 +130,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'TWEET1_MAX_CHARACTER_COUNT': '280',
     'TWEET1_OVERLAY_URL': '',
+    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。URLは省略しないでください。',
     'TWEET2': 'False',
     'TWEET2_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。
@@ -147,7 +148,8 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
-    'TWEET2_OVERLAY_URL': ''
+    'TWEET2_OVERLAY_URL': '',
+    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。URLは省略しないでください。'
 }
 
 # Firestore クライアントの初期化
@@ -162,8 +164,8 @@ def reload_settings():
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
     global NOTE, NOTE_SYSTEM_PROMPT, NOTE_ORDER_PROMPT, NOTE_MAX_CHARACTER_COUNT, NOTE_OVERLAY_URL, note_order_prompt
     global TWEET_REGENERATE_ORDER, TWEET_REGENERATE_COUNT
-    global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt
-    global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt
+    global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
+    global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -201,7 +203,6 @@ def reload_settings():
         NOTE_ORDER_PROMPT = []
     NOTE_MAX_CHARACTER_COUNT = int(get_setting('NOTE_MAX_CHARACTER_COUNT') or 0)
     NOTE_OVERLAY_URL = get_setting('NOTE_OVERLAY_URL')
-    TWEET_REGENERATE_ORDER = get_setting('REGENERATE_ORDER')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     TWEET1 = get_setting('TWEET1')
     TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
@@ -212,6 +213,7 @@ def reload_settings():
         TWEET1_ORDER_PROMPT = []
     TWEET1_MAX_CHARACTER_COUNT = int(get_setting('TWEET1_MAX_CHARACTER_COUNT') or 0)
     TWEET1_OVERLAY_URL = get_setting('TWEET1_OVERLAY_URL')
+    TWEET1_REGENERATE_ORDER = get_setting('TWEET1_REGENERATE_ORDER')
     TWEET2 = get_setting('TWEET2')
     TWEET2_SYSTEM_PROMPT = get_setting('TWEET2_SYSTEM_PROMPT')
     TWEET2_ORDER_PROMPT = get_setting('TWEET2_ORDER_PROMPT')
@@ -221,6 +223,7 @@ def reload_settings():
         TWEET2_ORDER_PROMPT = []
     TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
+    TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
     note_order_prompt = random.choice(NOTE_ORDER_PROMPT)
