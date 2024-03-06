@@ -41,7 +41,7 @@ REQUIRED_ENV_VARS = [
     "TWEET_REGENERATE_COUNT",
 ]
 
-DEFAULT_ENV_VARS = {
+DEFAULT_ENV_VARS = {}
 
 # Firestore クライアントの初期化
 try:
