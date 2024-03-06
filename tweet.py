@@ -241,7 +241,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         tweet_order_prompt = tweet1_order_prompt
         tweet_max_character_count = TWEET1_MAX_CHARACTER_COUNT
         tweet_overlay_url = TWEET1_OVERLAY_URL
-        tweet_regenerate_order = get_setting('TWEET1_REGENERATE_ORDER')
+        tweet_regenerate_order = TWEET1_REGENERATE_ORDER
         auth = tweepy.OAuthHandler(TWEET1_API_KEY, TWEET1_API_KEY_SECRET)
         auth.set_access_token(TWEET1_ACCESS_TOKEN, TWEET1_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
@@ -257,7 +257,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         tweet_order_prompt = tweet2_order_prompt
         tweet_max_character_count = TWEET2_MAX_CHARACTER_COUNT
         tweet_overlay_url = TWEET2_OVERLAY_URL
-        tweet_regenerate_order = get_setting('TWEET2_REGENERATE_ORDER')
+        tweet_regenerate_order = TWEET2_REGENERATE_ORDER
         auth = tweepy.OAuthHandler(TWEET2_API_KEY, TWEET2_API_KEY_SECRET)
         auth.set_access_token(TWEET2_ACCESS_TOKEN, TWEET2_ACCESS_TOKEN_SECRET)
         api = tweepy.API(auth)
