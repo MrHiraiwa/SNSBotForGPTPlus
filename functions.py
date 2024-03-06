@@ -161,7 +161,7 @@ def scraping(url, read_text_count, user_id):
             # Remove extra whitespace by splitting and joining
             result = ' '.join(result.split())
             print(result[:read_text_count])
-            return f"SYSTEM:現在、日本時刻で{nowDateStr}です。以下は{url}の読み込み結果です。読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。\n" + result[:read_text_count]  
+            return f"SYSTEM:現在、日本時刻で{nowDateStr}です。以下は{url}の読み込み結果です。先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。\n" + result[:read_text_count]  
 
         except Exception as e:
             if attempt < retries - 1:  # if it's not the last attempt
@@ -175,7 +175,7 @@ def scraping(url, read_text_count, user_id):
 def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
     image_result = ""
     if PAINTING_ON  == 'False':
-        return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は終わった情報として文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。", image_result
+        return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。イラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は終わった情報として文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。![画像](https://dummy.net/dummy.jpg)", image_result
     i_prompt = prompt + "\n" + paint_prompt
     print(f"generate_image prompt:{prompt}")
     try:
@@ -188,10 +188,10 @@ def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
         )
         image_result = response.data[0].url
         print(f"image_result: {image_result}")
-        return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は終わった情報として文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。", image_result
+        return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。イラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は終わった情報として文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。![画像](https://dummy.net/dummy.jpg)", image_result
     except Exception as e:
         if "content_policy_violation" in str(e):
-            return "SYSTEM: 読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", image_result
+            return "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", image_result
         time.sleep(10)
         print(f"Errors : {e}")
         return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", image_result
@@ -270,7 +270,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                 else:
                     if generate_image_called == False and PAINTING_ON  == 'True':
                         print("generate_image_called: False")
-                        i_messages_for_api.append({"role": "user", "content": "SYSTEM: 読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。"})
+                        i_messages_for_api.append({"role": "user", "content": "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。"})
                         attempt += 1
                     else:
                         print(f"GPT_MODEL: {GPT_MODEL}, i_messages_for_api: {i_messages_for_api}")
@@ -286,7 +286,7 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                 if scraping_called == False and scrape_links_and_text_called == False:
                     i_messages_for_api.append({"role": "user", "content": "SYSTEM: ページ読み込み機能や検索機能を一つも呼び出していないため、指示に基づきURLからのページの読み込み、又は検索を実施してください。"})
                 elif generate_image_called == False and PAINTING_ON  == 'True':
-                    i_messages_for_api.append({"role": "user", "content": "SYSTEM: 読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。"})                    
+                    i_messages_for_api.append({"role": "user", "content": "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。"})                    
                 else:
                     if image_result == "" and PAINTING_ON  == 'True':
                         print("Error attempt: not image.")
