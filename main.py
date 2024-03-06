@@ -111,7 +111,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'NOTE_MAX_CHARACTER_COUNT': '280',
     'NOTE_OVERLAY_URL': '',
-    'TWEET_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。URLは省略せずに文章を簡潔、あるいは省略し、文字数を減らしてツイートしてください。',
+    'TWEET_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。URLは省略しないでください。',
     'TWEET_REGENERATE_COUNT': '5',
     'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
