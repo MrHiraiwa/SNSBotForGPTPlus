@@ -130,7 +130,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'TWEET1_MAX_CHARACTER_COUNT': '280',
     'TWEET1_OVERLAY_URL': '',
-    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。URLは省略しないでください。',
+    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「参照元：」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。',
     'TWEET2': 'False',
     'TWEET2_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。
@@ -149,7 +149,7 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_URL': '',
-    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。URLは省略しないでください。'
+    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。'
 }
 
 # Firestore クライアントの初期化
