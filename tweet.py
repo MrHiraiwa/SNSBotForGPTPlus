@@ -132,21 +132,78 @@ reload_settings()
 
 def response_filter(bot_reply):
     # パターン定義
-    pattern1 = r"Tweet:"
-    pattern2 = r"Full article:"
-    pattern3 = r"learn more:"
-    pattern4 = r"More info:"
-    pattern5 = r"Tweeted with full URL:"
-    pattern6 = r"Read more:"
+    pattern102 = r"!\[.*\]\(.*\.jpg\)|!\[.*\]\(.*\.png\)"
+    pattern103 = r"\[画像.*\]"
+    pattern104 = r"\(.*\.jpg\)|\(.*\.png\)"
+    pattern105 = r"!\[.*\]\(http.*\.(jpg|png)\)"
+    pattern106 = r"\[参照元URL\]\((.*?)\)"
+    pattern107 = r"\n(http[s]?://[^\s]+)"
+    pattern108 = r"https://[^\s]+\.(jpg|png)"
+    pattern109 = r"\[参照元\]\((.*?)\)"
+    pattern110 = r"\[参照元[:：](https?://[^\]]+)\]"
+    pattern111 = r"参照元: (http[s]?://[^\s]+)"
+    pattern112 = r"「"
+    pattern113 = r"」"
+    pattern114 = r"【"
+    pattern115 = r"】"
+    pattern116 = r"\["
+    pattern117 = r"\]"
+    pattern118 = r"描いたイラストの"
+    pattern119 = r"参照元："
+    pattern120 = r"参照元➡️"
+    pattern121 = r"参照元👉"
+    pattern122 = r"参照元URL:"
+    pattern123 = r"参照元はこちら:"
+    pattern124 = r"詳細はこちら➡️"
+    pattern125 = r"参照元はこちら➡️"
+    pattern126 = r"参照元はこちら👉"
+    pattern127 = r"参照元はこちら→"
+    pattern128 = r"詳細[:：]"
+    pattern129 = r"\\n"
+    pattern130 = r"参照元[:：].*?\((https?://[^\)]+)\)"
+    pattern201 = r"Tweet:"
+    pattern202 = r"Full article:"
+    pattern203 = r"learn more:"
+    pattern204 = r"More info:"
+    pattern205 = r"Tweeted with full URL:"
+    pattern206 = r"Read more:"
 
     # パターンに基づいてテキストをフィルタリング
-
-    bot_reply = re.sub(pattern1, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern2, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern3, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern4, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern5, " ", bot_reply).strip()
-    bot_reply = re.sub(pattern6, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern102, "", bot_reply).strip()
+    bot_reply = re.sub(pattern103, "", bot_reply).strip()
+    bot_reply = re.sub(pattern104, "", bot_reply).strip()
+    bot_reply = re.sub(pattern105, "", bot_reply).strip()
+    bot_reply = re.sub(pattern106, r" \1", bot_reply).strip()
+    bot_reply = re.sub(pattern107, r" \1", bot_reply).strip()
+    bot_reply = re.sub(pattern108, "", bot_reply).strip()
+    bot_reply = re.sub(pattern109, r" \1", bot_reply).strip()
+    bot_reply = re.sub(pattern110, r" \1", bot_reply).strip()
+    bot_reply = re.sub(pattern111, r" \1", bot_reply).strip()
+    bot_reply = re.sub(pattern112, "　", bot_reply).strip()
+    bot_reply = re.sub(pattern113, "", bot_reply).strip()
+    bot_reply = re.sub(pattern114, "　", bot_reply).strip()
+    bot_reply = re.sub(pattern115, "", bot_reply).strip()
+    bot_reply = re.sub(pattern116, "　", bot_reply).strip()
+    bot_reply = re.sub(pattern117, "", bot_reply).strip()
+    bot_reply = re.sub(pattern118, "", bot_reply).strip()
+    bot_reply = re.sub(pattern119, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern120, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern121, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern122, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern123, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern124, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern125, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern126, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern127, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern128, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern129, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern130, r" \1", bot_reply).strip()
+    bot_reply = re.sub(pattern201, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern202, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern203, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern204, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern205, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern206, " ", bot_reply).strip()
     response = re.sub(r"\n{2,}", "\n", bot_reply)
 
     return response.rstrip('\n')
