@@ -293,8 +293,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
     extract_url = extract_urls_with_indices(bot_reply)
 
     if extract_url:
-        print(f"extract_url:{extract_url}")
-        extracted_url = extract_url[0]['url']
+        print(f"extract_url:{extract_url}"
     else:
         print(f"URL is not include tweet.")
         generate_tweet(tweet_no, user_id, r_bot_reply, retry_count + 1, public_img_url)
