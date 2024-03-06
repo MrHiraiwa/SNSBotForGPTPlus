@@ -133,6 +133,7 @@ reload_settings()
 
 def response_filter(bot_reply):
     # パターン定義
+    pattern101 = r"\[.*\]\((https?://[^\]]+)\)"
     pattern102 = r"!\[.*\]\(.*\.jpg\)|!\[.*\]\(.*\.png\)"
     pattern103 = r"\[画像.*\]"
     pattern104 = r"\(.*\.jpg\)|\(.*\.png\)"
@@ -173,6 +174,7 @@ def response_filter(bot_reply):
     pattern209 = r"Learn more! 👉"
 
     # パターンに基づいてテキストをフィルタリング
+    bot_reply = re.sub(pattern101, r" \1", bot_reply).strip()
     bot_reply = re.sub(pattern102, "", bot_reply).strip()
     bot_reply = re.sub(pattern103, "", bot_reply).strip()
     bot_reply = re.sub(pattern104, "", bot_reply).strip()
