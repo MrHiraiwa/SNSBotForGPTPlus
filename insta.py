@@ -13,11 +13,12 @@ import requests
 import tiktoken
 from PIL import Image
 from instapy import InstaPy
+import json
 
 from insta_functions import run_conversation
 
-INSTA_USERNAME = os.getenv('INSTA_USERNAME')
-INSTA_PASSWORD = os.getenv('INSTA_PASSWORD')
+INSTA_ACCESS_TOKEN = os.getenv('INSTA_ACCESS_TOKEN')
+INSTA_BUSINESS_ACCOUNT = os.getenv('INSTA_BUSINESS_ACCOUNT')
 
 session = InstaPy(username='INSTA_USERNAME', password='INSTA_PASSWORD')
 
@@ -124,6 +125,63 @@ def get_image_with_retry(url, max_retries=3, backoff_factor=0.3):
         print(f"Error fetching image from {url}: {e}")
         return None
 
+def basic_info():
+    # Instagramの接続設定
+    config = {
+        "access_token": INSTA_ACCESS_TOKEN,
+        "instagram_account_id": INSTA_BUSINESS_ACCOUNT,
+        "graph_domain": 'https://graph.facebook.com/',
+        "version": 'v18.0',
+        "endpoint_base": 'https://graph.facebook.com/v18.0/'
+    }
+    return config
+
+def InstaApiCall(url, params, request_type, files=None):
+    # Instagram APIへのリクエスト（ファイル送信対応）
+    if request_type == 'POST':
+        if files:
+            req = requests.post(url, data=params, files=files)
+        else:
+            req = requests.post(url, params)
+    else:
+        req = requests.get(url, params)
+    return json.loads(req.content)
+
+def createMedia(params, image_url):
+    # メディア（画像）の作成
+    url = params['endpoint_base'] + params['instagram_account_id'] + '/media'
+    data = {
+        'image_url': image_url,
+        'caption': params['caption'],
+        'access_token': params['access_token']
+    }
+    return InstaApiCall(url, data, 'POST')
+
+def publishMedia(mediaObjectId, params):
+    # メディア（画像）の公開
+    url = params['endpoint_base'] + params['instagram_account_id'] + '/media_publish'
+    data = {
+        'creation_id': mediaObjectId,
+        'access_token': params['access_token']
+    }
+    return InstaApiCall(url, data, 'POST')
+
+def instagram_upload_image(params, image_url):
+    # 画像をInstagramにアップロード
+    media_response = createMedia(params, image_url)
+
+    # media_responseの内容を確認
+    print("Media Response:", media_response)
+
+    # media_idの取得
+    if 'id' in media_response:
+        media_id = media_response['id']
+        publish_response = publishMedia(media_id, params)
+        return publish_response
+    else:
+        print("Failed to create media. Check the media_response for error details.")
+        return None
+
 def generate_insta(user_id, bot_reply, public_img_url=[]):
     r_bot_reply = bot_reply
     extract_url = extract_urls_with_indices(bot_reply)
@@ -159,19 +217,17 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         img_data.seek(0)
         media = api.media_upload(filename='image.png', file=img_data)
 
-        session.login()
-        # Set the actions
-        session.like_by_tags(['python', 'coding'], amount=100)
-        session.follow_by_list(['tech_guru', 'code_master'])
- 
-        # End the session
-        session.end()
+        # 基本情報を設定
+        params = basic_info()
+        params['caption'] = bot_reply
+
+        # 画像ファイルのパス
+        # 画像のURL
+        image_url = media
+
+
+        # 画像をアップロード
+        instagram_upload_image(params, image_url)
     else:
-        session.login()
-        # Set the actions
-        session.like_by_tags(['python', 'coding'], amount=100)
-        session.follow_by_list(['tech_guru', 'code_master'])
- 
-        # End the session
-        session.end()
+        print("Error: it has not include image URL.can not post instagram")
     return
