@@ -566,6 +566,8 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         delete_expired_urls('user_id')
     print(f"user_data: {user_data}")
 
+    #botの返信を追加
+    removed_assistant_messages.append({'role': 'assistant', 'content': bot_reply})
     # ユーザーデータにremoved_assistant_messagesを再追加
     if removed_assistant_messages:
         # 保存されたassistantメッセージをFirestoreに戻す
