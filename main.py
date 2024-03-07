@@ -551,7 +551,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         return
 
     if INSTA == 'True':
-        generate_insta(user_id, bot_reply, 0, public_img_url)
+        generate_insta(user_id, bot_reply, public_img_url)
     if TWEET1 == 'True':
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
     if TWEET2 == 'True':
