@@ -1,5 +1,6 @@
 gunicorn
 google-cloud-firestore
+google-cloud-storage
 openai
 tweepy
 flask
