@@ -251,15 +251,19 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         img_data = BytesIO()
         combined_img.save(img_data, format='PNG')
         img_data.seek(0)
-        
+
+        print(f"BUCKET_NAME: {BUCKET_NAME}, FILE_AGE: {FILE_AGE} ")
         if bucket_exists(BUCKET_NAME):
             set_bucket_lifecycle(BUCKET_NAME, FILE_AGE)
         else:
             print(f"Bucket {BUCKET_NAME} does not exist.")
             return "SYSTEM:バケットが存在しません。", public_img_url, public_img_url_s
         filename = str(uuid.uuid4())
+        print(f"filename: {filename}")
         blob_path = f'{user_id}/{filename}.png'
+        print(f"blob_path: {blob_path}")
         public_img_url = upload_blob(BUCKET_NAME, img_data, blob_path)
+        print(f"public_img_url: {public_img_url}")
  
         # 基本情報を設定
         params = basic_info()
