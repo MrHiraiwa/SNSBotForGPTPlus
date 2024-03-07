@@ -567,14 +567,15 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         
         delete_expired_urls('user_id')
     print(f"user_data: {user_data}")
-            
+
     # ユーザーデータにremoved_assistant_messagesを再追加
     if removed_assistant_messages:
         # 保存されたassistantメッセージをFirestoreに戻す
+        user_data['messages'] = []
         for msg in removed_assistant_messages:
             # メッセージを暗号化して保存
             encrypted_message = get_encrypted_message(msg['content'], hashed_secret_key)
-            user_data['messages'].insert(0, {'role': 'assistant', 'content': encrypted_message}) 
+            user_data['messages'].append({'role': 'assistant', 'content': encrypted_message})
    
     user_data['daily_usage'] = daily_usage
     user_data['updated_date'] = nowDate
