@@ -197,10 +197,7 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
     bot_reply = response.choices[0].message.content
     print(f"before filtered bot_reply: {bot_reply}")
     bot_reply = response_filter(bot_reply)
-        
     print(f"insta bot_reply: {bot_reply}, public_img_url: {public_img_url}")
-    character_count = int(parse_tweet(bot_reply).weightedLength)
-    print(f"insta character_count: {character_count}")
         
     if public_img_url:
         # Download image from URL
