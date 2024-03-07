@@ -8,7 +8,7 @@ from datetime import datetime, time, timedelta
 import pytz
 from flask import Flask, request, render_template, session, redirect, url_for, jsonify
 import unicodedata
-from twitter_text import parse_tweet, extract_urls_with_indices
+from twitter_text import parse_tweet
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import requests
@@ -24,7 +24,7 @@ from PIL import Image
 from urlextract import URLExtract
 
 from functions import chatgpt_functions, run_conversation
-# from note import generate_note
+from insta import generate_insta
 from tweet import generate_tweet
 
 API_KEY = os.getenv('API_KEY')
@@ -48,11 +48,11 @@ REQUIRED_ENV_VARS = [
     "PAINTING_ON",
     "URL_FILTER_ON",
     "DEFAULT_USER_ID",
-    "NOTE",
-    "NOTE_SYSTEM_PROMPT",
-    "NOTE_ORDER_PROMPT",
-    "NOTE_MAX_CHARACTER_COUNT",
-    "NOTE_OVERLAY_URL",
+    "INSTA",
+    "INSTA_SYSTEM_PROMPT",
+    "INSTA_ORDER_PROMPT",
+    "INSTA_MAX_CHARACTER_COUNT",
+    "INSTA_OVERLAY_URL",
     "TWEET_REGENERATE_COUNT",
     "TWEET1",
     "TWEET1_SYSTEM_PROMPT",
@@ -65,7 +65,9 @@ REQUIRED_ENV_VARS = [
     "TWEET2_ORDER_PROMPT",
     "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_URL",
-    "TWEET2_REGENERATE_ORDER"
+    "TWEET2_REGENERATE_ORDER",
+    "BUCKET_NAME",
+    "FILE_AGE"
 ]
 
 DEFAULT_ENV_VARS = {
@@ -101,16 +103,26 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
     'PAINTING_ON': 'True',
     'URL_FILTER_ON': 'True',
     'DEFAULT_USER_ID': 'default_user_id',
-    'NOTE': 'False',
-    'NOTE_SYSTEM_PROMPT': """
-あなたは、ブログ投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
+    'INSTA': 'False',
+    'INSTA_SYSTEM_PROMPT': """
+あなたは、ブログ投稿者です。あなたはURLからURLリストを読み込んだりページのの内容を読み込んだりできます。
+下記の条件に従ってツイートしてください。
+条件:
+-小学生にもわかりやすく書いてください。
+-出力文は女性を思わせる口語体で記述してください。
+-文脈に応じて、任意の場所で絵文字を使ってください。
+-読み込んだ記事に対して記者の視点や記事の当事者ではなく、記事を読んだ読者視点で感想を生成してください。
+-冒頭に「選んだ」「検索した」等の記載は不要です。記事をなるべく長い感想文にしてください。
+-生成した文章で、「描いたイラスト」「イラストにした」「イメージした」「イラスト完成」等、生成したイラストについて言及しないでください。
+-記事に合った画像を生成してください。
+文章の一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。
 """,
-    'NOTE_ORDER_PROMPT': """
-以下の記事をツイートしてください。
-文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
+    'INSTA_ORDER_PROMPT': """
+以下の記事をブログ記事として再整形して投稿してください。
+URLを省略せずに必ず含めてください。
 """,
-    'NOTE_MAX_CHARACTER_COUNT': '280',
-    'NOTE_OVERLAY_URL': '',
+    'INSTA_MAX_CHARACTER_COUNT': '99999',
+    'INSTA_OVERLAY_URL': '',
     'TWEET_REGENERATE_COUNT': '5',
     'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
@@ -148,7 +160,9 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_URL': '',
-    'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。'
+    'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。',
+    'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
+    'FILE_AGE': '1'
 }
 
 # Firestore クライアントの初期化
@@ -161,10 +175,11 @@ except Exception as e:
 def reload_settings():
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
-    global NOTE, NOTE_SYSTEM_PROMPT, NOTE_ORDER_PROMPT, NOTE_MAX_CHARACTER_COUNT, NOTE_OVERLAY_URL, note_order_prompt
+    global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_URL, insta_order_prompt
     global TWEET_REGENERATE_COUNT
     global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
+    global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -193,15 +208,15 @@ def reload_settings():
     PAINTING_ON = get_setting('PAINTING_ON')
     URL_FILTER_ON = get_setting('URL_FILTER_ON')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
-    NOTE = get_setting('NOTE')
-    NOTE_SYSTEM_PROMPT = get_setting('NOTE_SYSTEM_PROMPT')
-    NOTE_ORDER_PROMPT = get_setting('NOTE_ORDER_PROMPT')
-    if NOTE_ORDER_PROMPT:
-        NOTE_ORDER_PROMPT = NOTE_ORDER_PROMPT.split(',')
+    INSTA = get_setting('INSTA')
+    INSTA_SYSTEM_PROMPT = get_setting('INSTA_SYSTEM_PROMPT')
+    INSTA_ORDER_PROMPT = get_setting('INSTA_ORDER_PROMPT')
+    if INSTA_ORDER_PROMPT:
+        INSTA_ORDER_PROMPT = INSTA_ORDER_PROMPT.split(',')
     else:
-        NOTE_ORDER_PROMPT = []
-    NOTE_MAX_CHARACTER_COUNT = int(get_setting('NOTE_MAX_CHARACTER_COUNT') or 0)
-    NOTE_OVERLAY_URL = get_setting('NOTE_OVERLAY_URL')
+        INSTA_ORDER_PROMPT = []
+    INSTA_MAX_CHARACTER_COUNT = int(get_setting('INSTA_MAX_CHARACTER_COUNT') or 0)
+    INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     TWEET1 = get_setting('TWEET1')
     TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
@@ -223,10 +238,12 @@ def reload_settings():
     TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
     TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
+    BUCKET_NAME = get_setting('BUCKET_NAME')
+    FILE_AGE = get_setting('FILE_AGE')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
-    note_order_prompt = random.choice(NOTE_ORDER_PROMPT)
-    note_order_prompt = note_order_prompt.strip() 
+    insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
+    insta_order_prompt = insta_order_prompt.strip() 
     tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT)
     tweet1_order_prompt = tweet1_order_prompt.strip() 
     tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
@@ -234,8 +251,8 @@ def reload_settings():
     
     if '{nowDateStr}' in order_prompt:
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in note_order_prompt:
-        note_order_prompt = note_order_prompt.format(nowDateStr=nowDateStr)
+    if '{nowDateStr}' in insta_order_prompt:
+        insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
     if '{nowDateStr}' in tweet1_order_prompt:
         tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
     if '{nowDateStr}' in tweet2_order_prompt:
@@ -464,6 +481,22 @@ def create():
         return jsonify({"status": "Creation started"}), 200
     return jsonify({"status": "Creation started"}), 200
 
+def response_filter(bot_reply):
+    # パターン定義
+    pattern102 = r"!\[.*\]\(.*\.jpg\)|!\[.*\]\(.*\.png\)"
+    pattern103 = r"\[画像.*\]"
+    pattern104 = r"\(.*\.jpg\)|\(.*\.png\)"
+    pattern105 = r"!\[.*\]\(http.*\.(jpg|png)\)"
+
+    # パターンに基づいてテキストをフィルタリング
+    bot_reply = re.sub(pattern102, "", bot_reply).strip()
+    bot_reply = re.sub(pattern103, "", bot_reply).strip()
+    bot_reply = re.sub(pattern104, "", bot_reply).strip()
+    bot_reply = re.sub(pattern105, "", bot_reply).strip()
+    response = re.sub(r"\n{2,}", "\n", bot_reply)
+
+    return response.rstrip('\n')
+
 def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"initiated doc. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, r_public_img_url: {r_public_img_url}")
     doc_ref = db.collection(u'users').document(user_id)
@@ -473,6 +506,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     updated_date = nowDate
     daily_usage = 0
     public_img_url = []
+    removed_assistant_messages = []
     if user_doc.exists:
         print(f"already exist user doc.  user ID: {user_id}")
         user_data = user_doc.to_dict()
@@ -500,9 +534,10 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     ]
     for msg in user_data['messages']:
         decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
-        messages_for_api.append({'role': msg['role'], 'content': decrypted_content}) 
-      
-        messages_for_api.append({'role': 'user', 'content': order_prompt})
+        messages_for_api.append({'role': msg['role'], 'content': decrypted_content})
+        
+    # この行はループの外で一度だけ行う
+    messages_for_api.append({'role': 'user', 'content': order_prompt})
 
     # 各メッセージのエンコードされた文字数を合計
     total_chars = sum([len(encoding.encode(msg['content'])) for msg in messages_for_api])
@@ -511,6 +546,9 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     while total_chars > MAX_TOKEN_NUM and len(messages_for_api) > 3:
         removed_message = messages_for_api.pop(3)  # 最初の3つはシステムとアシスタントのメッセージなので保持
         total_chars -= len(encoding.encode(removed_message['content']))
+        # もし削除されたメッセージがassistantのものなら、一時リストに追加
+        if removed_message['role'] == 'assistant':
+            removed_assistant_messages.append(removed_message)
     if bot_reply is None:
         bot_reply, public_img_url = chatgpt_functions(AI_MODEL, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
         if bot_reply == "":
@@ -524,17 +562,17 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         response = run_conversation(AI_MODEL, messages_for_api)
         bot_reply = response.choices[0].message.content
         public_img_url = r_public_img_url
-        
+    bot_reply = response_filter(bot_reply)
     print(f"bot_reply: {bot_reply}, public_img_url: {public_img_url}")
-    character_count = int(parse_tweet(bot_reply).weightedLength)
-    print(f"character_count: {character_count}")
     extractor = URLExtract()
     extract_url = extractor.find_urls(bot_reply)
     if not extract_url:
         print(f"URL is not include doc.")
         generate_doc(user_id, retry_count + 1, None)
         return
-        
+
+    if INSTA == 'True':
+        generate_insta(user_id, bot_reply, public_img_url)
     if TWEET1 == 'True':
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
     if TWEET2 == 'True':
@@ -550,11 +588,18 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         
         delete_expired_urls('user_id')
     print(f"user_data: {user_data}")
-            
-    # ユーザー(order_prompt)とボットのメッセージを暗号化してFirestoreに保存
-    # order_promptの保存は不要と判断しコメントアウト
-    # user_data['messages'].append({'role': 'user', 'content': get_encrypted_message(order_prompt, hashed_secret_key)})
-    user_data['messages'].append({'role': 'assistant', 'content': get_encrypted_message(bot_reply, hashed_secret_key)})         
+
+    #botの返信を追加
+    removed_assistant_messages.append({'role': 'assistant', 'content': bot_reply})
+    # ユーザーデータにremoved_assistant_messagesを再追加
+    if removed_assistant_messages:
+        # 保存されたassistantメッセージをFirestoreに戻す
+        user_data['messages'] = []
+        for msg in removed_assistant_messages:
+            # メッセージを暗号化して保存
+            encrypted_message = get_encrypted_message(msg['content'], hashed_secret_key)
+            user_data['messages'].append({'role': 'assistant', 'content': encrypted_message})
+   
     user_data['daily_usage'] = daily_usage
     user_data['updated_date'] = nowDate
     user_data['last_image_url'] = public_img_url

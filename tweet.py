@@ -151,12 +151,12 @@ def response_filter(bot_reply):
     pattern116 = r"\["
     pattern117 = r"\]"
     pattern118 = r"描いたイラストの"
-    pattern119 = r"参照元："
+    pattern119 = r"参照元[:：]"
     pattern120 = r"参照元➡️"
     pattern121 = r"参照元👉"
     pattern122 = r"参照元URL:"
     pattern123 = r"参照元はこちら:"
-    pattern124 = r"詳細はこちら➡️"
+    pattern124 = r"詳細はこちら[➡️→]"
     pattern125 = r"参照元はこちら➡️"
     pattern126 = r"参照元はこちら👉"
     pattern127 = r"参照元はこちら→"
@@ -172,6 +172,7 @@ def response_filter(bot_reply):
     pattern207 = r"Reference:"
     pattern208 = r"Source:"
     pattern209 = r"Learn more! 👉"
+    pattern210 = r"Learn more:"
 
     # パターンに基づいてテキストをフィルタリング
     bot_reply = re.sub(pattern101, r" \1", bot_reply).strip()
@@ -213,6 +214,7 @@ def response_filter(bot_reply):
     bot_reply = re.sub(pattern207, " ", bot_reply).strip()
     bot_reply = re.sub(pattern208, " ", bot_reply).strip()
     bot_reply = re.sub(pattern209, " ", bot_reply).strip()
+    bot_reply = re.sub(pattern210, " ", bot_reply).strip()
     response = re.sub(r"\n{2,}", "\n", bot_reply)
 
     return response.rstrip('\n')
