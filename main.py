@@ -474,6 +474,22 @@ def create():
         return jsonify({"status": "Creation started"}), 200
     return jsonify({"status": "Creation started"}), 200
 
+def response_filter(bot_reply):
+    # パターン定義
+    pattern102 = r"!\[.*\]\(.*\.jpg\)|!\[.*\]\(.*\.png\)"
+    pattern103 = r"\[画像.*\]"
+    pattern104 = r"\(.*\.jpg\)|\(.*\.png\)"
+    pattern105 = r"!\[.*\]\(http.*\.(jpg|png)\)"
+
+    # パターンに基づいてテキストをフィルタリング
+    bot_reply = re.sub(pattern102, "", bot_reply).strip()
+    bot_reply = re.sub(pattern103, "", bot_reply).strip()
+    bot_reply = re.sub(pattern104, "", bot_reply).strip()
+    bot_reply = re.sub(pattern105, "", bot_reply).strip()
+    response = re.sub(r"\n{2,}", "\n", bot_reply)
+
+    return response.rstrip('\n')
+
 def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"initiated doc. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, r_public_img_url: {r_public_img_url}")
     doc_ref = db.collection(u'users').document(user_id)
@@ -539,7 +555,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         response = run_conversation(AI_MODEL, messages_for_api)
         bot_reply = response.choices[0].message.content
         public_img_url = r_public_img_url
-        
+    bot_reply = response_filter(bot_reply)
     print(f"bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     extractor = URLExtract()
     extract_url = extractor.find_urls(bot_reply)
