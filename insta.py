@@ -24,22 +24,13 @@ session = InstaPy(username='INSTA_USERNAME', password='INSTA_PASSWORD')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
 REQUIRED_ENV_VARS = [
-    "NOTE_SYSTEM_PROMPT",
-    "NOTE_ORDER_PROMPT",
-    "NOTE_OVERLAY_URL",
+    "INSTA_SYSTEM_PROMPT",
+    "INSTA_ORDER_PROMPT",
+    "INSTA_OVERLAY_URL",
     "AI_MODEL"
 ]
 
 DEFAULT_ENV_VARS = {}
-
-EMAIL = 'your email'
-PASSWORD = 'your password'
-USER_ID = 'your user_id'
-
-TITLE = 'Sample'
-CONTENT_PATH = 'content.txt'
-TAG_LIST = ['sample_tag']
-
 
 # Firestore クライアントの初期化
 try:
