@@ -8,7 +8,7 @@ from datetime import datetime, time, timedelta
 import pytz
 from flask import Flask, request, render_template, session, redirect, url_for, jsonify
 import unicodedata
-from twitter_text import parse_tweet, extract_urls_with_indices
+from twitter_text import parse_tweet
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import requests
@@ -541,8 +541,6 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         public_img_url = r_public_img_url
         
     print(f"bot_reply: {bot_reply}, public_img_url: {public_img_url}")
-    character_count = int(parse_tweet(bot_reply).weightedLength)
-    print(f"character_count: {character_count}")
     extractor = URLExtract()
     extract_url = extractor.find_urls(bot_reply)
     if not extract_url:
