@@ -208,15 +208,14 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         img_data = BytesIO()
         combined_img.save(img_data, format='PNG')
         img_data.seek(0)
-        media = api.media_upload(filename='image.png', file=img_data)
-
+ 
         # 基本情報を設定
         params = basic_info()
         params['caption'] = bot_reply
 
         # 画像ファイルのパス
         # 画像のURL
-        image_url = media
+        image_url = img_data
 
 
         # 画像をアップロード
