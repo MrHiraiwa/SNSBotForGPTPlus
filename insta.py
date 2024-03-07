@@ -181,7 +181,7 @@ def instagram_upload_image(params, image_url):
 
 def generate_insta(user_id, bot_reply, public_img_url=[]):
     r_bot_reply = bot_reply
-    print(f"initiated insta. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
+    print(f"initiated insta. user ID: {user_id}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     insta_system_prompt = INSTA_SYSTEM_PROMPT
     insta_overlay_url = INSTA_OVERLAY_URL
             
