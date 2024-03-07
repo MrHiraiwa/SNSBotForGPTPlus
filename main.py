@@ -24,7 +24,7 @@ from PIL import Image
 from urlextract import URLExtract
 
 from functions import chatgpt_functions, run_conversation
-# from note import generate_note
+# from insta import generate_insta
 from tweet import generate_tweet
 
 API_KEY = os.getenv('API_KEY')
