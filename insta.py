@@ -12,7 +12,6 @@ from requests.packages.urllib3.util.retry import Retry
 import requests
 import tiktoken
 from PIL import Image
-from Note_Client import Note
 
 from note_functions import run_conversation
 
