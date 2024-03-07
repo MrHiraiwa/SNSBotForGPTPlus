@@ -39,7 +39,7 @@ except Exception as e:
 
 def reload_settings():
     global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
-    global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_URL
+    global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_URL, insta_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
