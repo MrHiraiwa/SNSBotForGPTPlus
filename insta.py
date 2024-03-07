@@ -12,15 +12,12 @@ from requests.packages.urllib3.util.retry import Retry
 import requests
 import tiktoken
 from PIL import Image
-from instapy import InstaPy
 import json
 
 from insta_functions import run_conversation
 
 INSTA_ACCESS_TOKEN = os.getenv('INSTA_ACCESS_TOKEN')
 INSTA_BUSINESS_ACCOUNT = os.getenv('INSTA_BUSINESS_ACCOUNT')
-
-session = InstaPy(username='INSTA_USERNAME', password='INSTA_PASSWORD')
 
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
