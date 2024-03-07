@@ -3,6 +3,7 @@ from io import BytesIO
 import re
 import random
 from google.cloud import firestore
+from google.cloud import storage
 from datetime import datetime, time, timedelta
 import pytz
 from flask import Flask, request, render_template, session, redirect, url_for, jsonify
@@ -13,6 +14,7 @@ import requests
 import tiktoken
 from PIL import Image
 import json
+import uuid
 
 from insta_functions import run_conversation
 
@@ -179,6 +181,42 @@ def instagram_upload_image(params, image_url):
         print("Failed to create media. Check the media_response for error details.")
         return None
 
+def set_bucket_lifecycle(bucket_name, age):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+
+    rule = {
+        'action': {'type': 'Delete'},
+        'condition': {'age': age}  # The number of days after object creation
+    }
+    
+    bucket.lifecycle_rules = [rule]
+    bucket.patch()
+    return
+
+def bucket_exists(bucket_name):
+    """Check if a bucket exists."""
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    return bucket.exists()
+
+def upload_blob(bucket_name, source_stream, destination_blob_name, content_type='image/png'):
+    """Uploads a file to the bucket from a byte stream."""
+    try:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
+
+        blob.upload_from_file(source_stream, content_type=content_type)
+    
+        public_url = f"https://storage.googleapis.com/{bucket_name}/{destination_blob_name}"
+        return public_url
+    except Exception as e:
+        print(f"Failed to upload file: {e}")
+        raise
+
 def generate_insta(user_id, bot_reply, public_img_url=[]):
     r_bot_reply = bot_reply
     print(f"initiated insta. user ID: {user_id}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
@@ -208,6 +246,15 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         img_data = BytesIO()
         combined_img.save(img_data, format='PNG')
         img_data.seek(0)
+        
+        if bucket_exists(bucket_name):
+            set_bucket_lifecycle(bucket_name, file_age)
+        else:
+            print(f"Bucket {bucket_name} does not exist.")
+            return "SYSTEM:バケットが存在しません。", public_img_url, public_img_url_s
+        filename = str(uuid.uuid4())
+        blob_path = f'{user_id}/{filename}.png'
+        public_img_url = upload_blob(bucket_name, img_data, blob_path)
  
         # 基本情報を設定
         params = basic_info()
@@ -215,7 +262,7 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
 
         # 画像ファイルのパス
         # 画像のURL
-        image_url = img_data
+        image_url = public_img_url
 
 
         # 画像をアップロード
