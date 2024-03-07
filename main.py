@@ -48,11 +48,11 @@ REQUIRED_ENV_VARS = [
     "PAINTING_ON",
     "URL_FILTER_ON",
     "DEFAULT_USER_ID",
-    "NOTE",
-    "NOTE_SYSTEM_PROMPT",
-    "NOTE_ORDER_PROMPT",
-    "NOTE_MAX_CHARACTER_COUNT",
-    "NOTE_OVERLAY_URL",
+    "INSTA",
+    "INSTA_SYSTEM_PROMPT",
+    "INSTA_ORDER_PROMPT",
+    "INSTA_MAX_CHARACTER_COUNT",
+    "INSTA_OVERLAY_URL",
     "TWEET_REGENERATE_COUNT",
     "TWEET1",
     "TWEET1_SYSTEM_PROMPT",
@@ -101,16 +101,26 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
     'PAINTING_ON': 'True',
     'URL_FILTER_ON': 'True',
     'DEFAULT_USER_ID': 'default_user_id',
-    'NOTE': 'False',
-    'NOTE_SYSTEM_PROMPT': """
-あなたは、ブログ投稿者です。与えられたメッセージを英語で翻訳してツイートしてください。URLは省略しないでください。
+    'INSTA': 'False',
+    'INSTA_SYSTEM_PROMPT': """
+あなたは、ブログ投稿者です。あなたはURLからURLリストを読み込んだりページのの内容を読み込んだりできます。
+下記の条件に従ってツイートしてください。
+条件:
+-小学生にもわかりやすく書いてください。
+-出力文は女性を思わせる口語体で記述してください。
+-文脈に応じて、任意の場所で絵文字を使ってください。
+-読み込んだ記事に対して記者の視点や記事の当事者ではなく、記事を読んだ読者視点で感想を生成してください。
+-冒頭に「選んだ」「検索した」等の記載は不要です。記事をなるべく長い感想文にしてください。
+-生成した文章で、「描いたイラスト」「イラストにした」「イメージした」「イラスト完成」等、生成したイラストについて言及しないでください。
+-記事に合った画像を生成してください。
+文章の一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。
 """,
-    'NOTE_ORDER_PROMPT': """
-以下の記事をツイートしてください。
-文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
+    'INSTA_ORDER_PROMPT': """
+以下の記事をブログ記事として再整形して投稿してください。
+URLを省略せずに必ず含めてください。
 """,
-    'NOTE_MAX_CHARACTER_COUNT': '280',
-    'NOTE_OVERLAY_URL': '',
+    'INSTA_MAX_CHARACTER_COUNT': '99999',
+    'INSTA_OVERLAY_URL': '',
     'TWEET_REGENERATE_COUNT': '5',
     'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
@@ -161,7 +171,7 @@ except Exception as e:
 def reload_settings():
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
-    global NOTE, NOTE_SYSTEM_PROMPT, NOTE_ORDER_PROMPT, NOTE_MAX_CHARACTER_COUNT, NOTE_OVERLAY_URL, note_order_prompt
+    global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_URL, insta_order_prompt
     global TWEET_REGENERATE_COUNT
     global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
@@ -193,15 +203,15 @@ def reload_settings():
     PAINTING_ON = get_setting('PAINTING_ON')
     URL_FILTER_ON = get_setting('URL_FILTER_ON')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
-    NOTE = get_setting('NOTE')
-    NOTE_SYSTEM_PROMPT = get_setting('NOTE_SYSTEM_PROMPT')
-    NOTE_ORDER_PROMPT = get_setting('NOTE_ORDER_PROMPT')
-    if NOTE_ORDER_PROMPT:
-        NOTE_ORDER_PROMPT = NOTE_ORDER_PROMPT.split(',')
+    INSTA = get_setting('INSTA')
+    INSTA_SYSTEM_PROMPT = get_setting('INSTA_SYSTEM_PROMPT')
+    INSTA_ORDER_PROMPT = get_setting('INSTA_ORDER_PROMPT')
+    if INSTA_ORDER_PROMPT:
+        INSTA_ORDER_PROMPT = INSTA_ORDER_PROMPT.split(',')
     else:
-        NOTE_ORDER_PROMPT = []
-    NOTE_MAX_CHARACTER_COUNT = int(get_setting('NOTE_MAX_CHARACTER_COUNT') or 0)
-    NOTE_OVERLAY_URL = get_setting('NOTE_OVERLAY_URL')
+        INSTA_ORDER_PROMPT = []
+    INSTA_MAX_CHARACTER_COUNT = int(get_setting('INSTA_MAX_CHARACTER_COUNT') or 0)
+    INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     TWEET1 = get_setting('TWEET1')
     TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
@@ -225,8 +235,8 @@ def reload_settings():
     TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
-    note_order_prompt = random.choice(NOTE_ORDER_PROMPT)
-    note_order_prompt = note_order_prompt.strip() 
+    insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
+    insta_order_prompt = insta_order_prompt.strip() 
     tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT)
     tweet1_order_prompt = tweet1_order_prompt.strip() 
     tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
@@ -234,8 +244,8 @@ def reload_settings():
     
     if '{nowDateStr}' in order_prompt:
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in note_order_prompt:
-        note_order_prompt = note_order_prompt.format(nowDateStr=nowDateStr)
+    if '{nowDateStr}' in insta_order_prompt:
+        insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
     if '{nowDateStr}' in tweet1_order_prompt:
         tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
     if '{nowDateStr}' in tweet2_order_prompt:
@@ -539,7 +549,9 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         print(f"URL is not include doc.")
         generate_doc(user_id, retry_count + 1, None)
         return
-        
+
+    if INSTA == 'True':
+        generate_insta(user_id, bot_reply, 0, public_img_url)
     if TWEET1 == 'True':
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
     if TWEET2 == 'True':
