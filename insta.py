@@ -16,9 +16,10 @@ from instapy import InstaPy
 
 from note_functions import run_conversation
 
-NOTE_USERNAME = os.getenv('NOTE_EMAIL')
-NOTE_PASSWRD = os.getenv('NOTE_PASSWRD')
-NOTE_PASSWRD = os.getenv('NOTE_USERID')
+INSTA_USERNAME = os.getenv('INSTA_USERNAME')
+INSTA_PASSWORD = os.getenv('INSTA_PASSWORD')
+
+session = InstaPy(username='INSTA_USERNAME', password='INSTA_PASSWORD')
 
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
