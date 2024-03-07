@@ -17,4 +17,3 @@ beautifulsoup4
 pycryptodome
 Pillow
 urlextract
-InstaPy
