@@ -108,6 +108,8 @@ def update_setting(key, value):
 reload_settings()    
 
 def response_filter(bot_reply):
+    pattern101 = r"\[.*\]\((https?://[^\]]+)\)"
+    bot_reply = re.sub(pattern101, r" \1", bot_reply).strip()
     response = re.sub(r"\n{2,}", "\n", bot_reply)
     return response.rstrip('\n')
 
