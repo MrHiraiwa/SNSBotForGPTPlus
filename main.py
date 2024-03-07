@@ -66,7 +66,7 @@ REQUIRED_ENV_VARS = [
     "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_URL",
     "TWEET2_REGENERATE_ORDER",
-    "BACKET_NAME",
+    "BUCKET_NAME",
     "FILE_AGE"
 ]
 
@@ -161,7 +161,7 @@ URLを省略せずに必ず含めてください。
     'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_URL': '',
     'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。ハッシュタグがある場合はハッシュタグを1つ減らしてください。加えて文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。',
-    'BACKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
+    'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
     'FILE_AGE': '1'
 }
 
@@ -179,7 +179,7 @@ def reload_settings():
     global TWEET_REGENERATE_COUNT
     global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
-    global LINE_REPLY, BACKET_NAME, FILE_AGE
+    global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -238,7 +238,7 @@ def reload_settings():
     TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
     TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
-    BACKET_NAME = get_setting('BACKET_NAME')
+    BUCKET_NAME = get_setting('BUCKET_NAME')
     FILE_AGE = get_setting('FILE_AGE')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
