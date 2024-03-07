@@ -27,7 +27,9 @@ REQUIRED_ENV_VARS = [
     "INSTA_SYSTEM_PROMPT",
     "INSTA_ORDER_PROMPT",
     "INSTA_OVERLAY_URL",
-    "AI_MODEL"
+    "AI_MODEL",
+    "BUCKET_NAME",
+    "FILE_AGE"
 ]
 
 DEFAULT_ENV_VARS = {}
@@ -42,6 +44,7 @@ except Exception as e:
 def reload_settings():
     global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
     global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_URL, insta_order_prompt
+    global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -55,6 +58,8 @@ def reload_settings():
         INSTA_ORDER_PROMPT = []
     INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
+    BUCKET_NAME = get_setting('BUCKET_NAME')
+    FILE_AGE = get_setting('FILE_AGE')
     insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
     insta_order_prompt = insta_order_prompt.strip()
     if '{nowDateStr}' in insta_order_prompt:
@@ -247,14 +252,14 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         combined_img.save(img_data, format='PNG')
         img_data.seek(0)
         
-        if bucket_exists(bucket_name):
-            set_bucket_lifecycle(bucket_name, file_age)
+        if bucket_exists(BUCKET_NAME):
+            set_bucket_lifecycle(BUCKET_NAME, FILE_AGE)
         else:
-            print(f"Bucket {bucket_name} does not exist.")
+            print(f"Bucket {BUCKET_NAME} does not exist.")
             return "SYSTEM:バケットが存在しません。", public_img_url, public_img_url_s
         filename = str(uuid.uuid4())
         blob_path = f'{user_id}/{filename}.png'
-        public_img_url = upload_blob(bucket_name, img_data, blob_path)
+        public_img_url = upload_blob(BUCKET_NAME, img_data, blob_path)
  
         # 基本情報を設定
         params = basic_info()
