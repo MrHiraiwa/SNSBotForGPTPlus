@@ -5,6 +5,7 @@ import random
 import tweepy
 from google.cloud import firestore
 from datetime import datetime, time, timedelta
+import time
 import pytz
 from flask import Flask, request, render_template, session, redirect, url_for, jsonify
 import unicodedata
@@ -575,6 +576,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         generate_insta(user_id, bot_reply, public_img_url)
     if TWEET1 == 'True':
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
+    time.sleep(10)
     if TWEET2 == 'True':
         generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
 
