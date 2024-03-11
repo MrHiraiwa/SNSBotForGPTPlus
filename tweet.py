@@ -219,6 +219,10 @@ def response_filter(bot_reply):
 
     return response.rstrip('\n')
 
+def response_filter1(bot_reply):
+    response = re.sub(r"#\S+", "", bot_reply, count=1)
+    return response.rstrip('\n')
+
 
 def overlay_transparent_image(base_image, overlay_image, position=(0, 0)):
     base_image.paste(overlay_image, position, overlay_image)
@@ -286,6 +290,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         messages_for_api.append({'role': 'user', 'content': tweet_order_prompt + "\n" + bot_reply})
     else:
         # Retry
+        bot_reply = response_filter1(bot_reply)
         messages_for_api.append({'role': 'user', 'content': tweet_regenerate_order + "\n" + bot_reply})
     
     print(f"{tweet_no} initiate re run_conversation. messages_for_api: {messages_for_api}")
