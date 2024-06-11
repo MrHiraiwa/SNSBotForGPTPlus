@@ -31,10 +31,10 @@ https://note.com/modern_echium586/n/nebe1d7ae01f2
 - TWEET1_API_KEY_SECRET: TwitterのAPIキーシークレットを入力してください。
 - TWEET1_ACCESS_TOKEN: Twitterのアクセストークンを入力してください。
 - TWEET1_ACCESS_TOKEN_SECRET: Twitterのアクセストークンシークレットを入力してください。
-- TWEET1_API_KEY: 2アカウント目のTwitterのAPIキーを入力してください。
-- TWEET1_API_KEY_SECRET: 2アカウント目のTwitterのAPIキーシークレットを入力してください。
-- TWEET1_ACCESS_TOKEN: 2アカウント目のTwitterのアクセストークンを入力してください。
-- TWEET1_ACCESS_TOKEN_SECRET: 2アカウント目のTwitterのアクセストークンシークレットを入力してください。
+- TWEET2_API_KEY: 2アカウント目のTwitterのAPIキーを入力してください。
+- TWEET2_API_KEY_SECRET: 2アカウント目のTwitterのAPIキーシークレットを入力してください。
+- TWEET2_ACCESS_TOKEN: 2アカウント目のTwitterのアクセストークンを入力してください。
+- TWEET2_ACCESS_TOKEN_SECRET: 2アカウント目のTwitterのアクセストークンシークレットを入力してください。
 - INSTA_BUSINESS_ACCOUNT: Instagramのビジネスアカウントを入力してください。
 - INSTA_ACCESS_TOKEN: Instagramのアクセストークンを入力してください。
 
