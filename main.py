@@ -254,6 +254,7 @@ def reload_settings():
         tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
+    print(f"key: {key}")
     doc_ref = db.collection(u'settings').document('app_settings')
     doc = doc_ref.get()
 
@@ -263,6 +264,7 @@ def get_setting(key):
             # If the key does not exist in the document, use the default value
             default_value = DEFAULT_ENV_VARS.get(key, "")
             doc_ref.set({key: default_value}, merge=True)  # Add the new setting to the database
+            print(f"default_value: {default_value}")
             return default_value
         else:
             return doc_dict.get(key)
