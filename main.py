@@ -316,7 +316,14 @@ def get_decrypted_message(enc_message, hashed_secret_key):
     except Exception as e:
         print(f"Error decrypting message: {e}")
         return None
-    
+
+# Firestore クライアントの初期化
+try:
+    db = firestore.Client(database=DATABASE_NAME)
+except Exception as e:
+    print(f"Error creating Firestore client: {e}")
+    raise
+
 reload_settings()    
 
 app = Flask(__name__)
@@ -325,13 +332,6 @@ hash_object = SHA256.new(data=(secret_key or '').encode('utf-8'))
 hashed_secret_key = hash_object.digest()
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 encoding = tiktoken.encoding_for_model(AI_MODEL)
-
-# Firestore クライアントの初期化
-try:
-    db = firestore.Client(database=DATABASE_NAME)
-except Exception as e:
-    print(f"Error creating Firestore client: {e}")
-    raise
 
 executor = Executor(app)
 
