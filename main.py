@@ -159,7 +159,14 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
     'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
     'FILE_AGE': '1'
 }
-    
+
+# Firestore クライアントの初期化
+try:
+    db = firestore.Client(database=DATABASE_NAME)
+except Exception as e:
+    print(f"Error creating Firestore client: {e}")
+    raise
+
 def reload_settings():
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
@@ -310,13 +317,6 @@ def get_decrypted_message(enc_message, hashed_secret_key):
         print(f"Error decrypting message: {e}")
         return None
 
-# Firestore クライアントの初期化
-try:
-    db = firestore.Client(database=DATABASE_NAME)
-except Exception as e:
-    print(f"Error creating Firestore client: {e}")
-    raise
-
 reload_settings()    
 
 app = Flask(__name__)
@@ -327,7 +327,6 @@ app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 encoding = tiktoken.encoding_for_model(AI_MODEL)
 
 executor = Executor(app)
-
 
 @app.route('/reset_logs', methods=['POST'])
 def reset_logs():
