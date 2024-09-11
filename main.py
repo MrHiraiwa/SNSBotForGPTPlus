@@ -238,21 +238,24 @@ def reload_settings():
     FILE_AGE = get_setting('FILE_AGE')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
-    insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
-    insta_order_prompt = insta_order_prompt.strip() 
-    tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT)
-    tweet1_order_prompt = tweet1_order_prompt.strip() 
-    tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
-    tweet2_order_prompt = tweet2_order_prompt.strip() 
+    if INSTA_ORDER_PROMPT:
+        insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
+        insta_order_prompt = insta_order_prompt.strip() 
+        if '{nowDateStr}' in insta_order_prompt:
+            insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
+    if TWEET1_ORDER_PROMPT:
+        tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT)
+        tweet1_order_prompt = tweet1_order_prompt.strip() 
+        if '{nowDateStr}' in tweet1_order_prompt:
+            tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
+    if TWEET2_ORDER_PROMPT:
+        tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
+        tweet2_order_prompt = tweet2_order_prompt.strip() 
+        if '{nowDateStr}' in tweet2_order_prompt:
+            tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
     
     if '{nowDateStr}' in order_prompt:
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in insta_order_prompt:
-        insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in tweet1_order_prompt:
-        tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in tweet2_order_prompt:
-        tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
     print(f"key: {key}")
