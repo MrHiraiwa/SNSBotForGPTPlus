@@ -244,6 +244,7 @@ def get_image_with_retry(url, max_retries=3, backoff_factor=0.3):
         return None
 
 def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[]):
+    reload_settings()
     r_bot_reply = bot_reply
     print(f"initiated {tweet_no}. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     if tweet_no == 'tweet1':
