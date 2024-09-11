@@ -226,6 +226,7 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         raise
 
 def generate_insta(user_id, bot_reply, public_img_url=[]):
+    reload_settings()
     r_bot_reply = bot_reply
     print(f"initiated insta. user ID: {user_id}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     insta_system_prompt = INSTA_SYSTEM_PROMPT
