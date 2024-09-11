@@ -315,9 +315,7 @@ def get_decrypted_message(enc_message, hashed_secret_key):
         return message.decode().rstrip("\0")
     except Exception as e:
         print(f"Error decrypting message: {e}")
-        return None
-
-reload_settings()    
+        return None  
 
 app = Flask(__name__)
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
@@ -346,6 +344,7 @@ def reset_logs():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    reload_settings()  
     attempts_doc_ref = db.collection(u'settings').document('admin_attempts')
     attempts_doc = attempts_doc_ref.get()
     attempts_info = attempts_doc.to_dict() if attempts_doc.exists else {}
