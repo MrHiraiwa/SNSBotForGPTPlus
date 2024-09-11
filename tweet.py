@@ -86,10 +86,10 @@ def reload_settings():
     if TWEET2_ORDER_PROMPT:
         tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
         tweet2_order_prompt = tweet2_order_prompt.strip()
-    if '{nowDateStr}' in tweet1_order_prompt:
-        tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in tweet2_order_prompt:
-        tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
+        if '{nowDateStr}' in tweet1_order_prompt:
+            tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
+        if '{nowDateStr}' in tweet2_order_prompt:
+            tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
     doc_ref = db.collection(u'settings').document('app_settings')
