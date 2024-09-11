@@ -131,7 +131,7 @@ def update_setting(key, value):
     doc_ref = db.collection(u'settings').document('app_settings')
     doc_ref.update({key: value})
 
-reload_settings()    
+#reload_settings()    
 
 def response_filter(bot_reply):
     # パターン定義
