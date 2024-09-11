@@ -286,10 +286,15 @@ def get_setting_user(user_id, key):
             return doc_dict.get(key)
     else:
         return ''
-  
+
+
 def save_default_settings():
     doc_ref = db.collection(u'settings').document('app_settings')
-    doc_ref.set(DEFAULT_ENV_VARS, merge=True)
+    try:
+        doc_ref.set(DEFAULT_ENV_VARS, merge=True)
+        print("Default settings successfully saved to Firestore")
+    except Exception as e:
+        print(f"Error saving default settings to Firestore: {e}")
 
 def update_setting(key, value):
     doc_ref = db.collection(u'settings').document('app_settings')
