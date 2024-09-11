@@ -17,10 +17,14 @@ https://note.com/modern_echium586/n/nebe1d7ae01f2
 以下のステップに従ってセットアップしてください：
 1. Google Cloud Runでデプロイします：Google Cloud Consoleでプロジェクトを作成しCloud Run APIを有効にし、本レポジトリを指定してデプロイします。 デプロイの際は以下の環境変数を設定する必要があります。
 2. 同じプロジェクト内でFirestoreを有効にします：左側のナビゲーションメニューで「Firestore」を選択し、Firestoreをプロジェクトで有効にします。
-3. データベースを作成します：Firestoreダッシュボードに移動し、「データベースの作成」をクリックします。「ネイティブ」モードを選択します。
+3. データベースを作成します：Firestoreダッシュボードに移動し、「データベースの作成」をクリックします。データベース名を決めて「ネイティブ」モードを選択します。
 4. Custom SearchのAPIを有効にします。
-5. Cloud RunのURLに「/login」を付与して管理画面にログインし、パラメータを設定します
-7. TwitterのAPIを有効にし4つのKEY情報を環境変数に登録します。
+5. TwitterのAPIを有効にし4つのKEY情報を環境変数に登録します。
+6. Cloud Strageにファイルが削除されないバケットを設定しオーバレイ画像を設置します。
+7. Cloud Strageに1日で画像が消えるスクリプトが作業するワークフォルダを設定します。
+8. Cloud SchedulerでCloud runのトリガーURLに「/create」を付与したURLへのアクセスを設定します。
+9. Cloud RunのURLに「/login」を付与して管理画面にログインし、パラメータを設定します
+
 
 ## 環境変数
 - DATABASE_NAME: Firestoreのデータベース名を入力してください。

@@ -166,8 +166,9 @@ try:
 except Exception as e:
     print(f"Error creating Firestore client: {e}")
     raise
-    
+
 def reload_settings():
+    print("execute reload_settings")
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
     global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_URL, insta_order_prompt
@@ -237,23 +238,27 @@ def reload_settings():
     FILE_AGE = get_setting('FILE_AGE')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
-    insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
-    insta_order_prompt = insta_order_prompt.strip() 
-    tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT)
-    tweet1_order_prompt = tweet1_order_prompt.strip() 
-    tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
-    tweet2_order_prompt = tweet2_order_prompt.strip() 
+    if INSTA_ORDER_PROMPT:
+        insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
+        insta_order_prompt = insta_order_prompt.strip() 
+        if '{nowDateStr}' in insta_order_prompt:
+            insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
+    if TWEET1_ORDER_PROMPT:
+        tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT)
+        tweet1_order_prompt = tweet1_order_prompt.strip() 
+        if '{nowDateStr}' in tweet1_order_prompt:
+            tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
+    if TWEET2_ORDER_PROMPT:
+        tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
+        tweet2_order_prompt = tweet2_order_prompt.strip() 
+        if '{nowDateStr}' in tweet2_order_prompt:
+            tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
     
     if '{nowDateStr}' in order_prompt:
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in insta_order_prompt:
-        insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in tweet1_order_prompt:
-        tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
-    if '{nowDateStr}' in tweet2_order_prompt:
-        tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
+    print(f"key: {key}")
     doc_ref = db.collection(u'settings').document('app_settings')
     doc = doc_ref.get()
 
@@ -263,6 +268,7 @@ def get_setting(key):
             # If the key does not exist in the document, use the default value
             default_value = DEFAULT_ENV_VARS.get(key, "")
             doc_ref.set({key: default_value}, merge=True)  # Add the new setting to the database
+            print(f"default_value: {default_value}")
             return default_value
         else:
             return doc_dict.get(key)
@@ -284,10 +290,15 @@ def get_setting_user(user_id, key):
             return doc_dict.get(key)
     else:
         return ''
-  
+
+
 def save_default_settings():
     doc_ref = db.collection(u'settings').document('app_settings')
-    doc_ref.set(DEFAULT_ENV_VARS, merge=True)
+    try:
+        doc_ref.set(DEFAULT_ENV_VARS, merge=True)
+        print("Default settings successfully saved to Firestore")
+    except Exception as e:
+        print(f"Error saving default settings to Firestore: {e}")
 
 def update_setting(key, value):
     doc_ref = db.collection(u'settings').document('app_settings')
@@ -313,9 +324,9 @@ def get_decrypted_message(enc_message, hashed_secret_key):
         return message.decode().rstrip("\0")
     except Exception as e:
         print(f"Error decrypting message: {e}")
-        return None
-    
-reload_settings()    
+        return None  
+
+reload_settings()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
@@ -324,15 +335,7 @@ hashed_secret_key = hash_object.digest()
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 encoding = tiktoken.encoding_for_model(AI_MODEL)
 
-# Firestore クライアントの初期化
-try:
-    db = firestore.Client(database=DATABASE_NAME)
-except Exception as e:
-    print(f"Error creating Firestore client: {e}")
-    raise
-
 executor = Executor(app)
-
 
 @app.route('/reset_logs', methods=['POST'])
 def reset_logs():
@@ -352,6 +355,7 @@ def reset_logs():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    reload_settings()  
     attempts_doc_ref = db.collection(u'settings').document('admin_attempts')
     attempts_doc = attempts_doc_ref.get()
     attempts_info = attempts_doc.to_dict() if attempts_doc.exists else {}

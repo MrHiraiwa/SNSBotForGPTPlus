@@ -60,10 +60,11 @@ def reload_settings():
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
     BUCKET_NAME = get_setting('BUCKET_NAME')
     FILE_AGE = get_setting('FILE_AGE')
-    insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
-    insta_order_prompt = insta_order_prompt.strip()
-    if '{nowDateStr}' in insta_order_prompt:
-        insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
+    if INSTA_ORDER_PROMPT:
+        insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
+        insta_order_prompt = insta_order_prompt.strip()
+        if '{nowDateStr}' in insta_order_prompt:
+            insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
     doc_ref = db.collection(u'settings').document('app_settings')
@@ -105,7 +106,7 @@ def update_setting(key, value):
     doc_ref = db.collection(u'settings').document('app_settings')
     doc_ref.update({key: value})
 
-reload_settings()    
+#reload_settings()    
 
 def response_filter(bot_reply):
     pattern101 = r"\[.*\]\((https?://[^\]]+)\)"
