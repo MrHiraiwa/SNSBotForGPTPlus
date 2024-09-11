@@ -159,13 +159,6 @@ https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
     'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
     'FILE_AGE': '1'
 }
-
-# Firestore クライアントの初期化
-try:
-    db = firestore.Client(database=DATABASE_NAME)
-except Exception as e:
-    print(f"Error creating Firestore client: {e}")
-    raise
     
 def reload_settings():
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
