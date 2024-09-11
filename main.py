@@ -317,6 +317,8 @@ def get_decrypted_message(enc_message, hashed_secret_key):
         print(f"Error decrypting message: {e}")
         return None  
 
+reload_settings()
+
 app = Flask(__name__)
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 hash_object = SHA256.new(data=(secret_key or '').encode('utf-8'))
