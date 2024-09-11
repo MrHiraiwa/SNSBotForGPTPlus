@@ -63,8 +63,8 @@ def reload_settings():
     if INSTA_ORDER_PROMPT:
         insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
         insta_order_prompt = insta_order_prompt.strip()
-    if '{nowDateStr}' in insta_order_prompt:
-        insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
+        if '{nowDateStr}' in insta_order_prompt:
+            insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
     doc_ref = db.collection(u'settings').document('app_settings')
