@@ -23,96 +23,18 @@ INSTA_BUSINESS_ACCOUNT = os.getenv('INSTA_BUSINESS_ACCOUNT')
 
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
-REQUIRED_ENV_VARS = [
-    "INSTA_SYSTEM_PROMPT",
-    "INSTA_ORDER_PROMPT",
-    "INSTA_OVERLAY_URL",
-    "AI_MODEL",
-    "BUCKET_NAME",
-    "FILE_AGE"
-]
-
-DEFAULT_ENV_VARS = {}
-
 # Firestore クライアントの初期化
 try:
     db = firestore.Client(database=DATABASE_NAME)
 except Exception as e:
     print(f"Error creating Firestore client: {e}")
     raise
-
-def reload_settings():
-    global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
-    global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_URL, insta_order_prompt
-    global LINE_REPLY, BUCKET_NAME, FILE_AGE
-    jst = pytz.timezone('Asia/Tokyo')
-    nowDate = datetime.now(jst)
-    nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
-
-    AI_MODEL = get_setting('AI_MODEL')
-    INSTA_SYSTEM_PROMPT = get_setting('INSTA_SYSTEM_PROMPT')
-    INSTA_ORDER_PROMPT = get_setting('INSTA_ORDER_PROMPT')
-    if INSTA_ORDER_PROMPT:
-        INSTA_ORDER_PROMPT = INSTA_ORDER_PROMPT.split(',')
-    else:
-        INSTA_ORDER_PROMPT = []
-    INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
-    DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
-    BUCKET_NAME = get_setting('BUCKET_NAME')
-    FILE_AGE = get_setting('FILE_AGE')
-    insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
-    insta_order_prompt = insta_order_prompt.strip()
-    if '{nowDateStr}' in insta_order_prompt:
-        insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
-
-def get_setting(key):
-    doc_ref = db.collection(u'settings').document('app_settings')
-    doc = doc_ref.get()
-
-    if doc.exists:
-        doc_dict = doc.to_dict()
-        if key not in doc_dict:
-            # If the key does not exist in the document, use the default value
-            default_value = DEFAULT_ENV_VARS.get(key, "")
-            doc_ref.set({key: default_value}, merge=True)  # Add the new setting to the database
-            return default_value
-        else:
-            return doc_dict.get(key)
-    else:
-        # If the document does not exist, create it using the default settings
-        save_default_settings()
-        return DEFAULT_ENV_VARS.get(key, "")
-
-def get_setting_user(user_id, key):
-    doc_ref = db.collection(u'users').document(user_id) 
-    doc = doc_ref.get()
-
-    if doc.exists:
-        doc_dict = doc.to_dict()
-        if key not in doc_dict:
-            doc_ref.set({'start_free_day': start_free_day}, merge=True)
-            return ''
-        else:
-            return doc_dict.get(key)
-    else:
-        return ''
-
-def save_default_settings():
-    doc_ref = db.collection(u'settings').document('app_settings')
-    doc_ref.set(DEFAULT_ENV_VARS, merge=True)
-
-def update_setting(key, value):
-    doc_ref = db.collection(u'settings').document('app_settings')
-    doc_ref.update({key: value})
-
-reload_settings()    
-
+ 
 def response_filter(bot_reply):
     pattern101 = r"\[.*\]\((https?://[^\]]+)\)"
     bot_reply = re.sub(pattern101, r" \1", bot_reply).strip()
     response = re.sub(r"\n{2,}", "\n", bot_reply)
     return response.rstrip('\n')
-
 
 def overlay_transparent_image(base_image, overlay_image, position=(0, 0)):
     base_image.paste(overlay_image, position, overlay_image)
