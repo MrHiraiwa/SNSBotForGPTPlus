@@ -80,10 +80,12 @@ def reload_settings():
     TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
-    tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT) 
-    tweet1_order_prompt = tweet1_order_prompt.strip()
-    tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
-    tweet2_order_prompt = tweet2_order_prompt.strip()
+    if TWEET1_ORDER_PROMPT:
+        tweet1_order_prompt = random.choice(TWEET1_ORDER_PROMPT) 
+        tweet1_order_prompt = tweet1_order_prompt.strip()
+    if TWEET2_ORDER_PROMPT:
+        tweet2_order_prompt = random.choice(TWEET2_ORDER_PROMPT)
+        tweet2_order_prompt = tweet2_order_prompt.strip()
     if '{nowDateStr}' in tweet1_order_prompt:
         tweet1_order_prompt = tweet1_order_prompt.format(nowDateStr=nowDateStr)
     if '{nowDateStr}' in tweet2_order_prompt:
