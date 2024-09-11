@@ -60,8 +60,9 @@ def reload_settings():
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
     BUCKET_NAME = get_setting('BUCKET_NAME')
     FILE_AGE = get_setting('FILE_AGE')
-    insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
-    insta_order_prompt = insta_order_prompt.strip()
+    if INSTA_ORDER_PROMPT:
+        insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
+        insta_order_prompt = insta_order_prompt.strip()
     if '{nowDateStr}' in insta_order_prompt:
         insta_order_prompt = insta_order_prompt.format(nowDateStr=nowDateStr)
 
