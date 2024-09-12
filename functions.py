@@ -10,6 +10,7 @@ import io
 import uuid
 import functions_config as cf
 import json
+import hashlib
 from google.cloud import firestore
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
