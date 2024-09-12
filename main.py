@@ -72,7 +72,7 @@ REQUIRED_ENV_VARS = [
 ]
 
 DEFAULT_ENV_VARS = {
-    'AI_MODEL': 'gpt-3.5-turbo-0125',
+    'AI_MODEL': 'gpt-3.5-turbo',
     'SYSTEM_PROMPT': """
 あなたはプロの編集者です。あなたはURLからURLリストを読み込んだりページの内容を読み込んだりイラストの生成を行うことができます。
 下記の条件に従って読み込んだ文章を編集してください。
@@ -84,16 +84,16 @@ DEFAULT_ENV_VARS = {
 """,
     'ORDER_PROMPT': """
 現在は日本時間の{nowDateStr}です。
-次のURLからURLのリストを読み込んで一番上の記事を選び、URLのページを読み込んでから条件に従って文章を生成してください。一番上の記事が前回の記事の内容に近い内容であった場合は次の記事を選択してください。
-https://trends.google.co.jp/trends/trendingsearches/realtime?geo=JP&category=all
+次のURLからURLのリストを読み込んで一番上のニュース記事を選び、URLのページを読み込んでから条件に従って文章を生成してください。一番上のURLが記事ではなかったり前回の記事の内容に近い内容であった場合は次の記事を選択してください。
+https://news.yahoo.co.jp/
 """,
     'PAINT_PROMPT': """
 上記の場面を日本の萌えアニメスタイルのイラストで描いてください。実写風には絶対にしないでください。コスプレやキャラクターの着ぐるみを着た実写風画像も禁止です。
 日本人向けの画風にしてください。
 日本の萌えアニメ風イラストの全体に脈動感を持たせてください。登場人物は向きや姿勢を変えるなどして脈動感を与えてください。
 """,
-    'PARTIAL_MATCH_FILTER_WORDS': 'google.com,google.co.jp,www.iwate-np.co.jp,fashion-press.net,prtimes.jp,designlearn.co.jp,www.goal.com,sbbit.jp', 
-    'FULL_MATCH_FILTER_WORDS': '最新ブラウザ,gamebiz【ゲームビズ】,PR TIMES,日テレNEWS NNN,産経ニュース,ナゾロジー,日経メディカル,朝日新聞デジタル,NHKニュース,KBC九州朝日放送,北海道新聞,EE Times Japan,下野新聞社,ファミ通App,株探（かぶたん）,スポーツナビ,電撃ホビーウェブ,スポーツナビ,マテリアルフロー･プラス,Yahoo!ニュース,ライブドアニュース,日本経済新聞,Kufura,スポーツ報知,日本農業新聞,4Gamer,日刊スポーツ,tnc.co.jp,日刊スポーツ,広島ホームテレビ,au Webポータル,ファミ通,スポニチ Sponichi Annex,トラベル Watch,朝日新聞GLOBE＋,ペルソナチャンネル,読売新聞オンライン,静岡新聞,中国新聞デジタル,TBS NEWS DIG,秋田魁新報,GAME Watch,ロイター,毎日新聞,ナタリー,HOBBY Watch,goo ニュース,ハフポスト,Nordot,くるまのニュース,ORICON NEWS,ITmedia,サンスポ,hobby Watch,デイリースポーツ,TBSテレビ,楽天ブログ,Billboard JAPAN,AV Watch,NHK,神戸新聞,Forbes JAPAN,Bloomberg.co.jp,西宮市,Elle,Natalie',
+    'PARTIAL_MATCH_FILTER_WORDS': 'https://www.yahoo.co.jp/,https://support.yahoo-net.jp/,https://rdr.yahoo.co.jp/,https://yahoo.jp/,https://www.sp-hinan.jp/,https://account.edit.yahoo.co.jp/,https://accounts.yahoo.co.jp/,https://login.yahoo.co.jp/,https://news.yahoo.co.jp/users/,https://news.yahoo.co.jp/purchase,https://news.yahoo.co.jp/settings/,https://news.yahoo.co.jp/flash,https://news.yahoo.co.jp/live,https://news.yahoo.co.jp/expert/,https://news.yahoo.co.jp/original/,https://news.yahoo.co.jp/polls/,https://news.yahoo.co.jp/ranking/,https://news.yahoo.co.jp/paidnews,https://news.yahoo.co.jp/categories,https://news.yahoo.co.jp/topics,https://news.yahoo.co.jp/comment-timeline', 
+    'FULL_MATCH_FILTER_WORDS': 'hoge',
     'READ_TEXT_COUNT': '2000',
     'READ_LINKS_COUNT': '2000',
     'MAX_TOKEN_NUM': '4000',
