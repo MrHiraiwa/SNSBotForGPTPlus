@@ -333,7 +333,7 @@ app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
 hash_object = SHA256.new(data=(secret_key or '').encode('utf-8'))
 hashed_secret_key = hash_object.digest()
 app.secret_key = os.getenv('secret_key', default='YOUR-DEFAULT-SECRET-KEY')
-encoding = tiktoken.encoding_for_model(AI_MODEL)
+encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
 
 executor = Executor(app)
 
