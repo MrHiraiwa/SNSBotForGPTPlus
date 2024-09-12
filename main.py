@@ -80,7 +80,8 @@ DEFAULT_ENV_VARS = {
 -冒頭に「選んだ」「検索した」等の記載は不要です。記事をなるべく長い感想文にしてください。
 -生成した文章で、「描いたイラスト」「イラストにした」「イメージした」「イラスト完成」等、生成したイラストについて言及しないでください。
 -記事に合った画像を生成してください。
-文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。
+-イラストを生成する際は英語でプロンプトを生成してください。
+-文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。
 """,
     'ORDER_PROMPT': """
 現在は日本時間の{nowDateStr}です。
@@ -88,9 +89,9 @@ DEFAULT_ENV_VARS = {
 https://news.yahoo.co.jp/
 """,
     'PAINT_PROMPT': """
-上記の場面を日本の萌えアニメスタイルのイラストで描いてください。実写風には絶対にしないでください。コスプレやキャラクターの着ぐるみを着た実写風画像も禁止です。
-日本人向けの画風にしてください。
-日本の萌えアニメ風イラストの全体に脈動感を持たせてください。登場人物は向きや姿勢を変えるなどして脈動感を与えてください。
+Draw the above scene in Japanese Moe anime style. Please do not make it look like a live-action movie. Live-action images of people wearing cosplay or character costumes are also prohibited.
+Please make the drawing style suitable for Japanese people.
+Please give the entire Japanese Moe anime style illustration a sense of pulsation. Give the characters a sense of pulsation by changing their orientation and posture.
 """,
     'PARTIAL_MATCH_FILTER_WORDS': 'https://www.yahoo.co.jp/,https://support.yahoo-net.jp/,https://rdr.yahoo.co.jp/,https://yahoo.jp/,https://www.sp-hinan.jp/,https://account.edit.yahoo.co.jp/,https://accounts.yahoo.co.jp/,https://login.yahoo.co.jp/,https://news.yahoo.co.jp/users/,https://news.yahoo.co.jp/purchase,https://news.yahoo.co.jp/settings/,https://news.yahoo.co.jp/flash,https://news.yahoo.co.jp/live,https://news.yahoo.co.jp/expert/,https://news.yahoo.co.jp/original/,https://news.yahoo.co.jp/polls/,https://news.yahoo.co.jp/ranking/,https://news.yahoo.co.jp/paidnews,https://news.yahoo.co.jp/categories,https://news.yahoo.co.jp/topics,https://news.yahoo.co.jp/comment-timeline', 
     'FULL_MATCH_FILTER_WORDS': 'hoge',
