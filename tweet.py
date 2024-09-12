@@ -311,8 +311,9 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         print(f"extract_url:{extract_url}")
     else:
         print(f"URL is not include tweet.")
-        generate_tweet(tweet_no, user_id, r_bot_reply, retry_count + 1, public_img_url)
-        return
+        #URLが含まれなくてもやり直さない。
+        #generate_tweet(tweet_no, user_id, r_bot_reply, retry_count + 1, public_img_url)
+        #return
         
     if 1 <= character_count <= tweet_max_character_count:
             
