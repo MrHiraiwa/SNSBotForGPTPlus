@@ -265,7 +265,9 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                     arguments = json.loads(function_call.arguments)
                     bot_reply = scrape_links_and_text(arguments["link"], read_links_count, user_id, partial_match_filter_words, full_match_filter_words)
                     i_messages_for_api.append({"role": "user", "content": bot_reply})
+                    print("<----------------フィルタ対象の文章はここから---------------->")
                     print(f"scrape_links_and_text: {bot_reply}")
+                    print("<----------------フィルタ対象の文章はここまで---------------->")
                     attempt += 1
                 else:
                     if generate_image_called == False and PAINTING_ON  == 'True':
