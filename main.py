@@ -94,7 +94,7 @@ Please make the drawing style suitable for Japanese people.
 Please give the entire Japanese Moe anime style illustration a sense of pulsation. Give the characters a sense of pulsation by changing their orientation and posture.
 """,
     'PARTIAL_MATCH_FILTER_WORDS': 'https://www.yahoo.co.jp/,https://support.yahoo-net.jp/,https://rdr.yahoo.co.jp/,https://yahoo.jp/,https://www.sp-hinan.jp/,https://account.edit.yahoo.co.jp/,https://accounts.yahoo.co.jp/,https://login.yahoo.co.jp/,https://news.yahoo.co.jp/users/,https://news.yahoo.co.jp/purchase,https://news.yahoo.co.jp/settings/,https://news.yahoo.co.jp/flash,https://news.yahoo.co.jp/live,https://news.yahoo.co.jp/expert/,https://news.yahoo.co.jp/original/,https://news.yahoo.co.jp/polls/,https://news.yahoo.co.jp/ranking/,https://news.yahoo.co.jp/paidnews,https://news.yahoo.co.jp/categories,https://news.yahoo.co.jp/topics,https://news.yahoo.co.jp/comment-timeline', 
-    'FULL_MATCH_FILTER_WORDS': 'hoge',
+    'FULL_MATCH_FILTER_WORDS': 'https://news.yahoo.co.jp/',
     'READ_TEXT_COUNT': '2000',
     'READ_LINKS_COUNT': '2000',
     'MAX_TOKEN_NUM': '4000',
@@ -119,24 +119,24 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
     'INSTA_MAX_CHARACTER_COUNT': '99999',
     'INSTA_OVERLAY_URL': '',
     'TWEET_REGENERATE_COUNT': '7',
-    'TWEET1': 'True',
+    'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。 下記の条件に従ってツイートしてください。 
 条件: 
 -小学生にもわかりやすく書いてください。 
 -出力文 は女性を思わせる口語体で記述してください。 
 -文脈に応じて、任意の場所で絵文字を使ってください。絵文字を最低1個は含めてください。
-ツイートする文字数はURLを除いて日本語で117文字以内にしてください。 
+ツイートする文字数は日本語で117文字以内にしてください。 
 -ニュースに対して記者の視点やニュースの当事者ではなく、ニュースを読んだ読者視点で感想をツイートしてください。 
--ツイートの一番最後にハイパーリンク形式で参照元のURLを記載してください。
+-投稿に合ったハッシュタグを付与してください。
+-ツイートに参照元のURLを含めないでください。
 """,
     'TWEET1_ORDER_PROMPT': """
-以下の記事をツイートしてください。 文字数を250文字程度にしてください。URLを省略せずに必ず含めてください。
-ツイートの一番最後に「参照元：」のラベルに続けて参照元のURLを記載してください。
+以下の記事をツイートしてください。 文字数を250文字程度にしてください。
 """,
     'TWEET1_MAX_CHARACTER_COUNT': '280',
     'TWEET1_OVERLAY_URL': '',
-    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略し、文字数を減らしてツイートしてください。ツイートの一番最後に「参照元：」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。',
+    'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
     'TWEET2': 'False',
     'TWEET2_SYSTEM_PROMPT': """
 あなたは、Twitter投稿者です。
@@ -150,13 +150,19 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 -ツイートの一番最後にハイパーリンク形式で参照元のURLを記載してください。
 """,
     'TWEET2_ORDER_PROMPT': """
-以下の記事を英語でツイートしてください。URLは翻訳せずにそのままツイートしてください。
-文字数を240文字程度にしてください。URLを省略せずに必ず含めてください。
-ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLを記載してください。
+あなたは、Twitter投稿者です。 下記の条件に従ってツイートしてください。 
+条件: 
+-小学生にもわかりやすく書いてください。 
+-出力文 は女性を思わせる口語体で記述してください。 
+-文脈に応じて、任意の場所で絵文字を使ってください。絵文字を最低1個は含めてください。
+ツイートする文字数は日本語で117文字以内にしてください。 
+-ニュースに対して記者の視点やニュースの当事者ではなく、ニュースを読んだ読者視点で感想をツイートしてください。 
+-投稿に合ったハッシュタグを付与してください。
+-ツイートに参照元のURLを含めないでください。
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_URL': '',
-    'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略し、要約したものをツイートしてください。ツイートの一番最後に「learn more:」のラベルに続けて参照元のURLをハイパーリンク形式で記載してください。',
+    'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
     'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
     'FILE_AGE': '1'
 }
