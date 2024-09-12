@@ -10,6 +10,7 @@ import io
 import uuid
 import functions_config as cf
 import json
+import hashlib
 from google.cloud import firestore
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -39,7 +40,9 @@ nowDate = datetime.now(jst)
 nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
 
 def create_firestore_document_id_from_url(url):
-    return urllib.parse.quote_plus(url)
+    # URLをハッシュ化してIDを短縮
+    hash_object = hashlib.sha256(url.encode())
+    return hash_object.hexdigest()
     
 def check_url_in_firestore(url, user_id):
     url_encoded = create_firestore_document_id_from_url(url)
