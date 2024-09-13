@@ -55,18 +55,21 @@ REQUIRED_ENV_VARS = [
     "INSTA_SYSTEM_PROMPT",
     "INSTA_ORDER_PROMPT",
     "INSTA_MAX_CHARACTER_COUNT",
+    "INSTA_OVERLAY_ON",
     "INSTA_OVERLAY_URL",
     "TWEET_REGENERATE_COUNT",
     "TWEET1",
     "TWEET1_SYSTEM_PROMPT",
     "TWEET1_ORDER_PROMPT",
     "TWEET1_MAX_CHARACTER_COUNT",
+    "TWEET1_OVERLAY_ON",
     "TWEET1_OVERLAY_URL",
     "TWEET1_REGENERATE_ORDER",
     "TWEET2",
     "TWEET2_SYSTEM_PROMPT",
     "TWEET2_ORDER_PROMPT",
     "TWEET2_MAX_CHARACTER_COUNT",
+    "TWEET2_OVERLAY_ON",
     "TWEET2_OVERLAY_URL",
     "TWEET2_REGENERATE_ORDER",
     "BUCKET_NAME",
@@ -121,6 +124,7 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 以下の記事をインスタグラムに記事として再整形して投稿してください。記事をなるべく長い感想文にしてください。必ず記事に関連するキーワードのハッシュタグ(ツイートのような#を頭に付けた単語)を10個以上入れてください。URLを省略せずに必ず含めてください。
 """,
     'INSTA_MAX_CHARACTER_COUNT': '99999',
+    'INSTA_OVERLAY_ON': 'True',    
     'INSTA_OVERLAY_URL': '',
     'TWEET_REGENERATE_COUNT': '7',
     'TWEET1': 'False',
@@ -139,6 +143,7 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 以下の記事をツイートしてください。 文字数を250文字程度にしてください。
 """,
     'TWEET1_MAX_CHARACTER_COUNT': '280',
+    'TWEET1_OVERLAY_ON': 'True',   
     'TWEET1_OVERLAY_URL': '',
     'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
     'TWEET2': 'False',
@@ -165,6 +170,7 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 -ツイートに参照元のURLを含めないでください。
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
+    'TWEET2_OVERLAY_ON': 'True',   
     'TWEET2_OVERLAY_URL': '',
     'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
     'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
@@ -182,10 +188,10 @@ def reload_settings():
     print("execute reload_settings")
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, INSTA_AI_MODEL, TWEET_AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
-    global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_URL, insta_order_prompt
+    global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_ON, INSTA_OVERLAY_URL, insta_order_prompt
     global TWEET_REGENERATE_COUNT
-    global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
-    global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
+    global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_ON, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
+    global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_ON, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
     global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
@@ -225,6 +231,7 @@ def reload_settings():
     else:
         INSTA_ORDER_PROMPT = []
     INSTA_MAX_CHARACTER_COUNT = int(get_setting('INSTA_MAX_CHARACTER_COUNT') or 0)
+    INSTA_OVERLAY_ON = get_setting('INSTA_OVERLAY_ON')
     INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     TWEET1 = get_setting('TWEET1')
@@ -235,6 +242,7 @@ def reload_settings():
     else:
         TWEET1_ORDER_PROMPT = []
     TWEET1_MAX_CHARACTER_COUNT = int(get_setting('TWEET1_MAX_CHARACTER_COUNT') or 0)
+    TWEET1_OVERLAY_ON = get_setting('TWEET1_OVERLAY_ON')    
     TWEET1_OVERLAY_URL = get_setting('TWEET1_OVERLAY_URL')
     TWEET1_REGENERATE_ORDER = get_setting('TWEET1_REGENERATE_ORDER')
     TWEET2 = get_setting('TWEET2')
@@ -245,6 +253,7 @@ def reload_settings():
     else:
         TWEET2_ORDER_PROMPT = []
     TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
+    TWEET2_OVERLAY_ON = get_setting('TWEET2_OVERLAY_ON')
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
     TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
     BUCKET_NAME = get_setting('BUCKET_NAME')
@@ -271,7 +280,7 @@ def reload_settings():
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
-    print(f"key: {key}")
+    #print(f"key: {key}")
     doc_ref = db.collection(u'settings').document('app_settings')
     doc = doc_ref.get()
 

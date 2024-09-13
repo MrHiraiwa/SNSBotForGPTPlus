@@ -31,11 +31,13 @@ REQUIRED_ENV_VARS = [
     "TWEET1_SYSTEM_PROMPT",
     "TWEET1_ORDER_PROMPT",
     "TWEET1_MAX_CHARACTER_COUNT",
+    "TWEET1_OVERLAY_ON",
     "TWEET1_OVERLAY_URL",
     "TWEET1_REGENERATE_ORDER",
     "TWEET2_SYSTEM_PROMPT",
     "TWEET2_ORDER_PROMPT",
     "TWEET2_MAX_CHARACTER_COUNT",
+    "TWEET2_OVERLAY_ON",
     "TWEET2_OVERLAY_URL"
     "TWEET2_REGENERATE_ORDER",
     "TWEET_AI_MODEL",
@@ -53,8 +55,8 @@ except Exception as e:
 def reload_settings():
     global nowDate, nowDateStr, jst, TWEET_AI_MODEL, DEFAULT_USER_ID
     global tweet_regenerate_order, TWEET_REGENERATE_COUNT, tweet_system_prompt, tweet_order_prompt, tweet_max_character_count, tweet_overlay_url
-    global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, TWEET1_REGENERATE_ORDER, tweet1_order_prompt
-    global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, TWEET2_REGENERATE_ORDER, tweet2_order_prompt
+    global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_ON, TWEET1_OVERLAY_URL, TWEET1_REGENERATE_ORDER, tweet1_order_prompt
+    global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_ON, TWEET2_OVERLAY_URL, TWEET2_REGENERATE_ORDER, tweet2_order_prompt
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -67,6 +69,7 @@ def reload_settings():
     else:
         TWEET1_ORDER_PROMPT = []
     TWEET1_MAX_CHARACTER_COUNT = int(get_setting('TWEET1_MAX_CHARACTER_COUNT') or 0)
+    TWEET1_OVERLAY_ON = get_setting('TWEET1_OVERLAY_ON')
     TWEET1_OVERLAY_URL = get_setting('TWEET1_OVERLAY_URL')
     TWEET1_REGENERATE_ORDER = get_setting('TWEET1_REGENERATE_ORDER')
     TWEET2_SYSTEM_PROMPT = get_setting('TWEET2_SYSTEM_PROMPT')
@@ -76,6 +79,7 @@ def reload_settings():
     else:
         TWEET2_ORDER_PROMPT = []
     TWEET2_MAX_CHARACTER_COUNT = int(get_setting('TWEET2_MAX_CHARACTER_COUNT') or 0)
+    TWEET2_OVERLAY_ON = get_setting('TWEET2_OVERLAY_ON')
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
     TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
@@ -320,8 +324,20 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         if public_img_url:
             # Download image from URL
             base_img = get_image_with_retry(public_img_url)
-            overlay_img = get_image_with_retry(tweet_overlay_url)
-            combined_img = overlay_transparent_image(base_img, overlay_img)
+            overlay_img = None
+            combined_img = None
+            if tweet_no == "tweet1" and TWEET1_OVERLAY_ON == 'True':
+                print(f"combined overlay image. tweet_no:{tweet_no}, TWEET1_OVERLAY_ON:{TWEET1_OVERLAY_ON}")
+                overlay_img = get_image_with_retry(tweet_overlay_url)
+                combined_img = overlay_transparent_image(base_img, overlay_img)
+            elif tweet_no == "tweet2" and TWEET2_OVERLAY_ON == 'True':
+                print(f"combined overlay image. tweet_no:{tweet_no}, TWEET2_OVERLAY_ON:{TWEET2_OVERLAY_ON}")
+                overlay_img = get_image_with_retry(tweet_overlay_url)
+                combined_img = overlay_transparent_image(base_img, overlay_img)
+            else:
+                print(f"not combined overlay image. tweet_no:{tweet_no}, TWEET1_OVERLAY_ON:{TWEET1_OVERLAY_ON}, TWEET2_OVERLAY_ON:{TWEET2_OVERLAY_ON}")
+                combined_img = base_img
+            
             # オーバーレイされた画像をアップロード
             img_data = BytesIO()
             combined_img.save(img_data, format='PNG')
