@@ -243,10 +243,11 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
         print(f"first response: {response}")
         if response:
             tool_calls = response.choices[0].message.tool_calls
+
             if tool_calls:
                 print(f"tool_calls: {tool_calls}")
                 for tool_call in tool_calls:
-                    if tool_call.function.name == "generate_image" and not generate_image_called:
+                    if hasattr(tool_call, 'function') and tool_call.function.name == "generate_image" and not generate_image_called:
                         generate_image_called = True
                         arguments = json.loads(tool_call.function.arguments)
                         if isinstance(arguments["prompt"], list):
@@ -257,16 +258,16 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                         if image_result == "" and PAINTING_ON == 'True':
                             generate_image_called = False
                         attempt += 1
-                    elif tool_calls.function.name == "scraping" and not scraping_called:
+                    elif hasattr(tool_call, 'function') and tool_call.function.name == "scraping" and not scraping_called:
                         scraping_called = True
-                        arguments = json.loads(tool_calls.function.arguments)
+                        arguments = json.loads(tool_call.function.arguments)
                         bot_reply = scraping(arguments["link"], read_text_count, user_id)
                         i_messages_for_api.append({"role": "user", "content": bot_reply})
                         print(f"scraping: {bot_reply}")
                         attempt += 1
-                    elif tool_calls.function.name == "scrape_links_and_text" and not scrape_links_and_text_called:
+                    elif hasattr(tool_call, 'function') and tool_call.function.name == "scrape_links_and_text" and not scrape_links_and_text_called:
                         scrape_links_and_text_called = True
-                        arguments = json.loads(tool_calls.function.arguments)
+                        arguments = json.loads(tool_call.function.arguments)
                         bot_reply = scrape_links_and_text(arguments["link"], read_links_count, user_id, partial_match_filter_words, full_match_filter_words)
                         i_messages_for_api.append({"role": "user", "content": bot_reply})
                         print("<----------------フィルタ対象の文章はここから---------------->")
