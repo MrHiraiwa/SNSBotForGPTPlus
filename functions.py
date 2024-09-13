@@ -215,7 +215,7 @@ def run_conversation_f(GPT_MODEL, messages):
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
             messages=messages,
-            tools=cf.functions,
+            tools=cf.tools,
             tool_choice="auto",
         )
         return response  # レスポンス全体を返す
