@@ -41,6 +41,8 @@ REQUIRED_ENV_VARS = [
     "ORDER_PROMPT",
     "PAINT_PROMPT",
     "AI_MODEL",
+    "INSTA_AI_MODEL",
+    "TWEET_AI_MODEL",
     "PARTIAL_MATCH_FILTER_WORDS",
     "FULL_MATCH_FILTER_WORDS",
     "READ_TEXT_COUNT",
@@ -73,6 +75,8 @@ REQUIRED_ENV_VARS = [
 
 DEFAULT_ENV_VARS = {
     'AI_MODEL': 'gpt-3.5-turbo',
+    'INSTA_AI_MODEL': 'gpt-4o',
+    'TWEET_AI_MODEL': 'gpt-4o',
     'SYSTEM_PROMPT': """
 あなたはプロの編集者です。あなたはURLからURLリストを読み込んだりページの内容を読み込んだりイラストの生成を行うことができます。
 下記の条件に従って読み込んだ文章を編集してください。
@@ -176,7 +180,7 @@ except Exception as e:
 
 def reload_settings():
     print("execute reload_settings")
-    global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
+    global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, INSTA_AI_MODEL, TWEET_AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
     global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_URL, insta_order_prompt
     global TWEET_REGENERATE_COUNT
@@ -188,6 +192,8 @@ def reload_settings():
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
 
     AI_MODEL = get_setting('AI_MODEL')
+    INSTA_AI_MODEL = get_setting('AI_MODEL')
+    TWEET_AI_MODEL = get_setting('AI_MODEL')
     SYSTEM_PROMPT = get_setting('SYSTEM_PROMPT')
     ORDER_PROMPT = get_setting('ORDER_PROMPT')
     if ORDER_PROMPT:

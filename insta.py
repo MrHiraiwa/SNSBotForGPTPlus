@@ -27,7 +27,7 @@ REQUIRED_ENV_VARS = [
     "INSTA_SYSTEM_PROMPT",
     "INSTA_ORDER_PROMPT",
     "INSTA_OVERLAY_URL",
-    "AI_MODEL",
+    "INSTA_AI_MODEL",
     "BUCKET_NAME",
     "FILE_AGE"
 ]
@@ -42,14 +42,14 @@ except Exception as e:
     raise
 
 def reload_settings():
-    global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
+    global nowDate, nowDateStr, jst, INSTA_AI_MODEL, DEFAULT_USER_ID
     global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_URL, insta_order_prompt
     global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
 
-    AI_MODEL = get_setting('AI_MODEL')
+    INSTA_AI_MODEL = get_setting('INSTA_AI_MODEL')
     INSTA_SYSTEM_PROMPT = get_setting('INSTA_SYSTEM_PROMPT')
     INSTA_ORDER_PROMPT = get_setting('INSTA_ORDER_PROMPT')
     if INSTA_ORDER_PROMPT:
@@ -240,7 +240,7 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
     messages_for_api.append({'role': 'user', 'content': insta_order_prompt + "\n" + bot_reply})
     
     print(f"insta initiate run_conversation. messages_for_api: {messages_for_api}")
-    response = run_conversation(AI_MODEL, messages_for_api)
+    response = run_conversation(INSTA_AI_MODEL, messages_for_api)
     bot_reply = response.choices[0].message.content
     print(f"before filtered bot_reply: {bot_reply}")
     bot_reply = response_filter(bot_reply)
