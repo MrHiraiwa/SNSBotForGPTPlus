@@ -280,7 +280,7 @@ def reload_settings():
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
-    print(f"key: {key}")
+    #print(f"key: {key}")
     doc_ref = db.collection(u'settings').document('app_settings')
     doc = doc_ref.get()
 
