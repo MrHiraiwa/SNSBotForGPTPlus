@@ -38,7 +38,7 @@ REQUIRED_ENV_VARS = [
     "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_URL"
     "TWEET2_REGENERATE_ORDER",
-    "AI_MODEL",
+    "TWEET_AI_MODEL",
 ]
 
 DEFAULT_ENV_VARS = {}
@@ -51,7 +51,7 @@ except Exception as e:
     raise
 
 def reload_settings():
-    global nowDate, nowDateStr, jst, AI_MODEL, DEFAULT_USER_ID
+    global nowDate, nowDateStr, jst, TWEET_AI_MODEL, DEFAULT_USER_ID
     global tweet_regenerate_order, TWEET_REGENERATE_COUNT, tweet_system_prompt, tweet_order_prompt, tweet_max_character_count, tweet_overlay_url
     global TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_URL, TWEET1_REGENERATE_ORDER, tweet1_order_prompt
     global TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_URL, TWEET2_REGENERATE_ORDER, tweet2_order_prompt
@@ -59,7 +59,7 @@ def reload_settings():
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
 
-    AI_MODEL = get_setting('AI_MODEL')
+    TWEET_AI_MODEL = get_setting('TWEET_AI_MODEL')
     TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
     TWEET1_ORDER_PROMPT = get_setting('TWEET1_ORDER_PROMPT')
     if TWEET1_ORDER_PROMPT:
@@ -297,7 +297,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         messages_for_api.append({'role': 'user', 'content': tweet_regenerate_order + "\n" + bot_reply})
     
     print(f"{tweet_no} initiate re run_conversation. messages_for_api: {messages_for_api}")
-    response = run_conversation(AI_MODEL, messages_for_api)
+    response = run_conversation(TWEET_AI_MODEL, messages_for_api)
     bot_reply = response.choices[0].message.content
     print(f"before filtered bot_reply: {bot_reply}")
     bot_reply = response_filter(bot_reply)
