@@ -26,6 +26,7 @@ DATABASE_NAME = os.getenv('DATABASE_NAME')
 REQUIRED_ENV_VARS = [
     "INSTA_SYSTEM_PROMPT",
     "INSTA_ORDER_PROMPT",
+    "INSTA_OVERLAY_ON",
     "INSTA_OVERLAY_URL",
     "INSTA_AI_MODEL",
     "BUCKET_NAME",
@@ -43,7 +44,7 @@ except Exception as e:
 
 def reload_settings():
     global nowDate, nowDateStr, jst, INSTA_AI_MODEL, DEFAULT_USER_ID
-    global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_URL, insta_order_prompt
+    global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_ON, INSTA_OVERLAY_URL, insta_order_prompt
     global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
@@ -56,6 +57,7 @@ def reload_settings():
         INSTA_ORDER_PROMPT = INSTA_ORDER_PROMPT.split(',')
     else:
         INSTA_ORDER_PROMPT = []
+    INSTA_OVERLAY_ON = get_setting('INSTA_OVERLAY_ON')
     INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
     BUCKET_NAME = get_setting('BUCKET_NAME')
@@ -249,8 +251,12 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
     if public_img_url:
         # Download image from URL
         base_img = get_image_with_retry(public_img_url)
-        overlay_img = get_image_with_retry(insta_overlay_url)
-        combined_img = overlay_transparent_image(base_img, overlay_img)
+        if INSTA_OVERLAY_ON　== "True":
+            overlay_img = get_image_with_retry(insta_overlay_url)
+            combined_img = overlay_transparent_image(base_img, overlay_img)
+        else
+            combined_img = base_img
+        
         # オーバーレイされた画像をアップロード
         img_data = BytesIO()
         combined_img.save(img_data, format='PNG')
