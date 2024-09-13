@@ -17,7 +17,7 @@ tools = [
                         "description": "読みたいページのURL"
                     }
                 },
-                "required": ["switch"]
+                "required": ["link"]
             }
         }
     },
@@ -39,7 +39,7 @@ tools = [
                         "description": "読みたいページのURL"
                     }
                 },
-                "required": ["switch"]
+                "required": ["link"]
             }
         }
     },
@@ -61,7 +61,7 @@ tools = [
                         "description": "描画する人物や物の名前や特徴、ポーズの表情や種類、背景の具体的な要素、全体の色使い、物語のコンテキストや特定のアクセサリー、持ち物など複数の要素を含んだ画像生成の元となる文章。"
                     }
                 },
-                "required": ["switch"]
+                "required": ["prompt"]
             }
         }
     }
