@@ -199,8 +199,8 @@ def reload_settings():
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
 
     AI_MODEL = get_setting('AI_MODEL')
-    INSTA_AI_MODEL = get_setting('AI_MODEL')
-    TWEET_AI_MODEL = get_setting('AI_MODEL')
+    INSTA_AI_MODEL = get_setting('INSTA_AI_MODEL')
+    TWEET_AI_MODEL = get_setting('TWEET_AI_MODEL')
     SYSTEM_PROMPT = get_setting('SYSTEM_PROMPT')
     ORDER_PROMPT = get_setting('ORDER_PROMPT')
     if ORDER_PROMPT:
