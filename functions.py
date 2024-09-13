@@ -215,8 +215,8 @@ def run_conversation_f(GPT_MODEL, messages):
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
             messages=messages,
-            functions=cf.functions,
-            function_call="auto",
+            tools=cf.functions,
+            tool_choice="auto",
         )
         return response  # レスポンス全体を返す
     except Exception as e:
