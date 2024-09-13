@@ -253,7 +253,7 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         base_img = get_image_with_retry(public_img_url)
         overlay_img = None
         combined_img = None
-        if INSTA_OVERLAY_ON　== "True":
+        if INSTA_OVERLAY_ON == "True":
             overlay_img = get_image_with_retry(insta_overlay_url)
             combined_img = overlay_transparent_image(base_img, overlay_img)
         else
