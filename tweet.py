@@ -326,11 +326,11 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
             base_img = get_image_with_retry(public_img_url)
             overlay_img = None
             combined_img = None
-            if tweet_no == 'tweet1' and TWEET1_OVERLAY_ON == "True":
+            if tweet_no == 'tweet1' and TWEET1_OVERLAY_ON == 'True':
                 print(f"combined overlay image. tweet_no:{tweet_no}, TWEET1_OVERLAY_ON:{TWEET1_OVERLAY_ON}")
                 overlay_img = get_image_with_retry(tweet_overlay_url)
                 combined_img = overlay_transparent_image(base_img, overlay_img)
-            elif tweet_no == 'tweet2' and TWEET2_OVERLAY_ON == "True":
+            elif tweet_no == 'tweet2' and TWEET2_OVERLAY_ON == 'True':
                 print(f"combined overlay image. tweet_no:{tweet_no}, TWEET1_OVERLAY_ON:{TWEET1_OVERLAY_ON}")
                 overlay_img = get_image_with_retry(tweet_overlay_url)
                 combined_img = overlay_transparent_image(base_img, overlay_img)
