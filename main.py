@@ -143,7 +143,7 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 以下の記事をツイートしてください。 文字数を250文字程度にしてください。
 """,
     'TWEET1_MAX_CHARACTER_COUNT': '280',
-    'TWEET2_OVERLAY_ON': 'True',   
+    'TWEET1_OVERLAY_ON': 'True',   
     'TWEET1_OVERLAY_URL': '',
     'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
     'TWEET2': 'False',
