@@ -332,7 +332,7 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
             elif tweet_no == 'tweet2' and TWEET2_OVERLAY_ON == "True":
                 overlay_img = get_image_with_retry(tweet_overlay_url)
                 combined_img = overlay_transparent_image(base_img, overlay_img)
-            else
+            else:
                 combined_img = base_img
             
             # オーバーレイされた画像をアップロード
