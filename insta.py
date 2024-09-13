@@ -256,7 +256,7 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         if INSTA_OVERLAY_ON == "True":
             overlay_img = get_image_with_retry(insta_overlay_url)
             combined_img = overlay_transparent_image(base_img, overlay_img)
-        else
+        else:
             combined_img = base_img
         
         # オーバーレイされた画像をアップロード
