@@ -215,8 +215,8 @@ def run_conversation_f(GPT_MODEL, messages):
         response = gpt_client.chat.completions.create(
             model=GPT_MODEL,
             messages=messages,
-            functions=cf.functions,
-            function_call="auto",
+            tools=cf.tools,
+            tool_choice="auto",
         )
         return response  # レスポンス全体を返す
     except Exception as e:
@@ -242,50 +242,52 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
         response = run_conversation_f(GPT_MODEL, i_messages_for_api)
         print(f"first response: {response}")
         if response:
-            function_call = response.choices[0].message.function_call
-            if function_call:
-                print(f"function_call: {function_call}")
-                if function_call.name == "generate_image" and not generate_image_called:
-                    generate_image_called = True
-                    arguments = json.loads(function_call.arguments)
-                    if isinstance(arguments["prompt"], list):
-                        arguments["prompt"] = " ".join(arguments["prompt"])
-                    bot_reply, image_result = generate_image(arguments["prompt"], paint_prompt, user_id, PAINTING_ON)
-                    i_messages_for_api.append({"role": "user", "content": bot_reply})
-                    print(f"generate_image: {bot_reply}")
-                    if image_result == ""and PAINTING_ON == 'True':
-                        generate_image_called = False
-                    attempt += 1
-                elif function_call.name == "scraping" and not scraping_called:
-                    scraping_called = True
-                    arguments = json.loads(function_call.arguments)
-                    bot_reply = scraping(arguments["link"], read_text_count, user_id)
-                    i_messages_for_api.append({"role": "user", "content": bot_reply})
-                    print(f"scraping: {bot_reply}")
-                    attempt += 1
-                elif function_call.name == "scrape_links_and_text" and not scrape_links_and_text_called:
-                    scrape_links_and_text_called = True
-                    arguments = json.loads(function_call.arguments)
-                    bot_reply = scrape_links_and_text(arguments["link"], read_links_count, user_id, partial_match_filter_words, full_match_filter_words)
-                    i_messages_for_api.append({"role": "user", "content": bot_reply})
-                    print("<----------------フィルタ対象の文章はここから---------------->")
-                    print(f"scrape_links_and_text: {bot_reply}")
-                    print("<----------------フィルタ対象の文章はここまで---------------->")
-                    attempt += 1
-                else:
-                    if generate_image_called == False and PAINTING_ON  == 'True':
-                        print("generate_image_called: False")
-                        i_messages_for_api.append({"role": "user", "content": "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。"})
+            tool_calls = response.choices[0].message.tool_calls
+
+            if tool_calls:
+                print(f"tool_calls: {tool_calls}")
+                for tool_call in tool_calls:
+                    if hasattr(tool_call, 'function') and tool_call.function.name == "generate_image" and not generate_image_called:
+                        generate_image_called = True
+                        arguments = json.loads(tool_call.function.arguments)
+                        if isinstance(arguments["prompt"], list):
+                            arguments["prompt"] = " ".join(arguments["prompt"])
+                        bot_reply, image_result = generate_image(arguments["prompt"], paint_prompt, user_id, PAINTING_ON)
+                        i_messages_for_api.append({"role": "user", "content": bot_reply})
+                        print(f"generate_image: {bot_reply}")
+                        if image_result == "" and PAINTING_ON == 'True':
+                            generate_image_called = False
+                        attempt += 1
+                    elif hasattr(tool_call, 'function') and tool_call.function.name == "scraping" and not scraping_called:
+                        scraping_called = True
+                        arguments = json.loads(tool_call.function.arguments)
+                        bot_reply = scraping(arguments["link"], read_text_count, user_id)
+                        i_messages_for_api.append({"role": "user", "content": bot_reply})
+                        print(f"scraping: {bot_reply}")
+                        attempt += 1
+                    elif hasattr(tool_call, 'function') and tool_call.function.name == "scrape_links_and_text" and not scrape_links_and_text_called:
+                        scrape_links_and_text_called = True
+                        arguments = json.loads(tool_call.function.arguments)
+                        bot_reply = scrape_links_and_text(arguments["link"], read_links_count, user_id, partial_match_filter_words, full_match_filter_words)
+                        i_messages_for_api.append({"role": "user", "content": bot_reply})
+                        print("<----------------フィルタ対象の文章はここから---------------->")
+                        print(f"scrape_links_and_text: {bot_reply}")
+                        print("<----------------フィルタ対象の文章はここまで---------------->")
                         attempt += 1
                     else:
-                        print(f"GPT_MODEL: {GPT_MODEL}, i_messages_for_api: {i_messages_for_api}")
-                        response = run_conversation(GPT_MODEL, i_messages_for_api)
-                        print(f"else response: {response}")
-                        if response:
-                            bot_reply = response.choices[0].message.content, image_result
+                        if generate_image_called == False and PAINTING_ON  == 'True':
+                            print("generate_image_called: False")
+                            i_messages_for_api.append({"role": "user", "content": "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。"})
+                            attempt += 1
                         else:
-                            bot_reply = "An error occurred while processing the question"
-                        return bot_reply, image_result   
+                            print(f"GPT_MODEL: {GPT_MODEL}, i_messages_for_api: {i_messages_for_api}")
+                            response = run_conversation(GPT_MODEL, i_messages_for_api)
+                            print(f"else response: {response}")
+                            if response:
+                                bot_reply = response.choices[0].message.content, image_result
+                            else:
+                                bot_reply = "An error occurred while processing the question"
+                            return bot_reply, image_result   
             else:
                 attempt += 1
                 if scraping_called == False and scrape_links_and_text_called == False:
