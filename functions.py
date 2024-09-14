@@ -133,7 +133,7 @@ def scrape_links_and_text(url, read_links_count, user_id, partial_match_filter_w
                 raise Exception("No links found matching the criteria")
 
 
-            return  f"SYSTEM:以下は{url}の読み込み結果です。詳細の確認のため1番上のURLを読み込んでください。\n" + result[:read_links_count]
+            return  f"SYSTEM:以下は{url}の読み込み結果です。詳細の確認のため興味のある項目のURLを読み込んでください。\n" + result[:read_links_count]
 
         except Exception as e:
             if attempt < retries - 1:  # 最後の試みではない場合
