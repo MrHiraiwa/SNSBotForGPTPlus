@@ -136,7 +136,7 @@ def scrape_links_and_text(url, read_links_count, user_id, partial_match_filter_w
                 raise Exception("No links found matching the criteria")
 
 
-            return  f"SYSTEM:以下は{url}の読み込み結果です。詳細の確認のため興味のある項目のURLをscrapingで読み込んでください。\n" + result[:read_links_count]
+            return  f"SYSTEM:以下は{url}の読み込み結果です。URLを一つ選択してリンクを除くWeb ページの文章を読み込んでください。\n" + result[:read_links_count]
 
         except Exception as e:
             if attempt < retries - 1:  # 最後の試みではない場合
@@ -167,7 +167,7 @@ def scraping(url, read_text_count, user_id):
             # Remove extra whitespace by splitting and joining
             result = ' '.join(result.split())
             print(result[:read_text_count])
-            return f"SYSTEM:現在、日本時刻で{nowDateStr}です。以下は{url}の読み込み結果です。先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。\n" + result[:read_text_count]  
+            return f"SYSTEM:現在、日本時刻で{nowDateStr}です。以下は{url}の読み込み結果です。読み込んだページの内容からイメージを詳細に思い描いて画像を生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。\n" + result[:read_text_count]  
 
         except Exception as e:
             if attempt < retries - 1:  # if it's not the last attempt
