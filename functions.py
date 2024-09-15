@@ -43,9 +43,12 @@ def create_firestore_document_id_from_url(url):
     # URLをハッシュ化してIDを短縮
     hash_object = hashlib.sha256(url.encode())
     return hash_object.hexdigest()
-    
+
 def check_url_in_firestore(url, user_id):
+    # URLをハッシュ化
     url_encoded = create_firestore_document_id_from_url(url)
+    
+    # Firestoreに保存されたハッシュ化されたURLと比較
     user_doc_ref = db.collection(u'users').document(user_id)
     url_doc_ref = user_doc_ref.collection('scraped_urls').document(url_encoded)
 
