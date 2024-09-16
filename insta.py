@@ -43,6 +43,7 @@ except Exception as e:
 def reload_settings():
     global nowDate, nowDateStr, jst, INSTA_AI_MODEL, DEFAULT_USER_ID
     global INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_OVERLAY_ON, INSTA_OVERLAY_URL, insta_order_prompt
+    global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -197,9 +198,9 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
     messages_for_api = [
         {'role': 'system', 'content': insta_system_prompt}
     ]
-
+        
     messages_for_api.append({'role': 'user', 'content': insta_order_prompt + "\n" + bot_reply})
-
+    
     print(f"insta initiate run_conversation. messages_for_api: {messages_for_api}")
     response = run_conversation(INSTA_AI_MODEL, messages_for_api)
     bot_reply = response.choices[0].message.content
@@ -213,25 +214,46 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
         overlay_img = None
         combined_img = None
         if INSTA_OVERLAY_ON == 'True':
-            print(f"combined overlay image. INSTA_OVERLAY_ON: {INSTA_OVERLAY_ON}")
+            print(f"combined overlay image. INSTA_OVERLAY_ON:{INSTA_OVERLAY_ON}")
             overlay_img = get_image_with_retry(insta_overlay_url)
             combined_img = overlay_transparent_image(base_img, overlay_img)
         else:
             print("not combined overlay image.")
             combined_img = base_img
 
-        # 画像データをバイトストリームに変換
+        # 画像データをバイトストリームに変換（Instagram APIがサポートする形式に変換）
         img_data = BytesIO()
-        combined_img.save(img_data, format='PNG')
+        combined_img.save(img_data, format='JPEG')  # ここでJPEGに変換
         img_data.seek(0)
 
-        # 基本情報を設定
+        # Instagram API に直接バイトデータを送信
         params = basic_info()
         params['caption'] = bot_reply
 
-        # 画像をInstagramにアップロード
-        instagram_upload_image(params, img_data)
-    else:
-        print("Error: it has not include image URL. cannot post to Instagram")
-    return
+        # 画像ファイルとして送信
+        files = {
+            'source': img_data
+        }
 
+        media_response = InstaApiCall(
+            url=params['endpoint_base'] + params['instagram_account_id'] + '/media',
+            params={
+                'caption': params['caption'],
+                'access_token': params['access_token']
+            },
+            request_type='POST',
+            files=files
+        )
+
+        print("Media Response:", media_response)
+
+        if 'id' in media_response:
+            media_id = media_response['id']
+            publish_response = publishMedia(media_id, params)
+            return publish_response
+        else:
+            print("Failed to create media. Check the media_response for error details.")
+            return None
+    else:
+        print("Error: No image URL provided.")
+    return
