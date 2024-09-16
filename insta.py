@@ -28,7 +28,9 @@ REQUIRED_ENV_VARS = [
     "INSTA_ORDER_PROMPT",
     "INSTA_OVERLAY_ON",
     "INSTA_OVERLAY_URL",
-    "INSTA_AI_MODEL"
+    "INSTA_AI_MODEL",
+    "BUCKET_NAME",
+    "FILE_AGE"
 ]
 
 DEFAULT_ENV_VARS = {}
@@ -58,6 +60,8 @@ def reload_settings():
     INSTA_OVERLAY_ON = get_setting('INSTA_OVERLAY_ON')
     INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
     DEFAULT_USER_ID = get_setting('DEFAULT_USER_ID')
+    BUCKET_NAME = get_setting('BUCKET_NAME')
+    FILE_AGE = get_setting('FILE_AGE')
     if INSTA_ORDER_PROMPT:
         insta_order_prompt = random.choice(INSTA_ORDER_PROMPT) 
         insta_order_prompt = insta_order_prompt.strip()
@@ -187,13 +191,49 @@ def instagram_upload_image(params, image_url):
         print("Failed to create media. Check the media_response for error details.")
         return None
 
+def set_bucket_lifecycle(bucket_name, age):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+
+    rule = {
+        'action': {'type': 'Delete'},
+        'condition': {'age': age}  # The number of days after object creation
+    }
+    
+    bucket.lifecycle_rules = [rule]
+    bucket.patch()
+    return
+
+def bucket_exists(bucket_name):
+    """Check if a bucket exists."""
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    return bucket.exists()
+
+def upload_blob(bucket_name, source_stream, destination_blob_name, content_type='image/png'):
+    """Uploads a file to the bucket from a byte stream."""
+    try:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
+
+        blob.upload_from_file(source_stream, content_type=content_type)
+    
+        public_url = f"https://storage.googleapis.com/{bucket_name}/{destination_blob_name}"
+        return public_url
+    except Exception as e:
+        print(f"Failed to upload file: {e}")
+        raise
+
 def generate_insta(user_id, bot_reply, public_img_url=[]):
     reload_settings()
     r_bot_reply = bot_reply
     print(f"initiated insta. user ID: {user_id}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     insta_system_prompt = INSTA_SYSTEM_PROMPT
     insta_overlay_url = INSTA_OVERLAY_URL
-
+            
     # OpenAI API へのリクエスト
     messages_for_api = [
         {'role': 'system', 'content': insta_system_prompt}
@@ -207,53 +247,49 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
     print(f"before filtered bot_reply: {bot_reply}")
     bot_reply = response_filter(bot_reply)
     print(f"insta bot_reply: {bot_reply}, public_img_url: {public_img_url}")
-
+        
     if public_img_url:
-        # URLから画像をダウンロード
+        # Download image from URL
         base_img = get_image_with_retry(public_img_url)
         overlay_img = None
         combined_img = None
         if INSTA_OVERLAY_ON == 'True':
-            print(f"combined overlay image. INSTA_OVERLAY_ON:{INSTA_OVERLAY_ON}")
+            print(f"combined overlay image. TINSTA_OVERLAY_ON:{INSTA_OVERLAY_ON}")
             overlay_img = get_image_with_retry(insta_overlay_url)
             combined_img = overlay_transparent_image(base_img, overlay_img)
         else:
             print("not combined overlay image.")
             combined_img = base_img
-
-        # 画像データをバイトストリームに変換（Instagram APIがサポートする形式に変換）
+        
+        # オーバーレイされた画像をアップロード
         img_data = BytesIO()
-        combined_img.save(img_data, format='JPEG')  # ここでJPEGに変換
+        combined_img.save(img_data, format='PNG')
         img_data.seek(0)
 
-        # Instagram API に直接バイトデータを送信
+        print(f"BUCKET_NAME: {BUCKET_NAME}, FILE_AGE: {FILE_AGE} ")
+        if bucket_exists(BUCKET_NAME):
+            set_bucket_lifecycle(BUCKET_NAME, FILE_AGE)
+        else:
+            print(f"Bucket {BUCKET_NAME} does not exist.")
+            return "SYSTEM:バケットが存在しません。", public_img_url, public_img_url_s
+        filename = str(uuid.uuid4())
+        print(f"filename: {filename}")
+        blob_path = f'{user_id}/{filename}.png'
+        print(f"blob_path: {blob_path}")
+        public_img_url = upload_blob(BUCKET_NAME, img_data, blob_path)
+        print(f"public_img_url: {public_img_url}")
+ 
+        # 基本情報を設定
         params = basic_info()
         params['caption'] = bot_reply
 
-        # 画像ファイルとして送信
-        files = {
-            'source': img_data
-        }
+        # 画像ファイルのパス
+        # 画像のURL
+        image_url = public_img_url
 
-        media_response = InstaApiCall(
-            url=params['endpoint_base'] + params['instagram_account_id'] + '/media',
-            params={
-                'caption': params['caption'],
-                'access_token': params['access_token']
-            },
-            request_type='POST',
-            files=files
-        )
 
-        print("Media Response:", media_response)
-
-        if 'id' in media_response:
-            media_id = media_response['id']
-            publish_response = publishMedia(media_id, params)
-            return publish_response
-        else:
-            print("Failed to create media. Check the media_response for error details.")
-            return None
+        # 画像をアップロード
+        instagram_upload_image(params, image_url)
     else:
-        print("Error: No image URL provided.")
+        print("Error: it has not include image URL.can not post instagram")
     return
