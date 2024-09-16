@@ -71,9 +71,7 @@ REQUIRED_ENV_VARS = [
     "TWEET2_MAX_CHARACTER_COUNT",
     "TWEET2_OVERLAY_ON",
     "TWEET2_OVERLAY_URL",
-    "TWEET2_REGENERATE_ORDER",
-    "BUCKET_NAME",
-    "FILE_AGE"
+    "TWEET2_REGENERATE_ORDER"
 ]
 
 DEFAULT_ENV_VARS = {
@@ -173,9 +171,7 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
     'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_ON': 'True',   
     'TWEET2_OVERLAY_URL': '',
-    'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
-    'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
-    'FILE_AGE': '1'
+    'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。'
 }
 
 # Firestore クライアントの初期化
@@ -193,7 +189,6 @@ def reload_settings():
     global TWEET_REGENERATE_COUNT
     global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_ON, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_ON, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
-    global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -257,8 +252,6 @@ def reload_settings():
     TWEET2_OVERLAY_ON = get_setting('TWEET2_OVERLAY_ON')
     TWEET2_OVERLAY_URL = get_setting('TWEET2_OVERLAY_URL')
     TWEET2_REGENERATE_ORDER = get_setting('TWEET2_REGENERATE_ORDER')
-    BUCKET_NAME = get_setting('BUCKET_NAME')
-    FILE_AGE = get_setting('FILE_AGE')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
     if INSTA_ORDER_PROMPT:
