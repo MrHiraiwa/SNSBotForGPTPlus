@@ -77,7 +77,7 @@ REQUIRED_ENV_VARS = [
 ]
 
 DEFAULT_ENV_VARS = {
-    'AI_MODEL': 'gpt-3.5-turbo',
+    'AI_MODEL': 'gpt-4o-mini',
     'INSTA_AI_MODEL': 'chatgpt-4o-latest',
     'TWEET_AI_MODEL': 'chatgpt-4o-latest',
     'SYSTEM_PROMPT': """
