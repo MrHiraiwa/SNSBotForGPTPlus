@@ -609,7 +609,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         generate_doc(user_id, retry_count + 1, None)
         return
 
-    if INSTA == 'True':
+    if INSTA == 'True' and PAINTING_ON == 'True':
         generate_insta(user_id, bot_reply, public_img_url)
     if TWEET1 == 'True':
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
