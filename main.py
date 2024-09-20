@@ -72,6 +72,7 @@ REQUIRED_ENV_VARS = [
     "TWEET2_OVERLAY_ON",
     "TWEET2_OVERLAY_URL",
     "TWEET2_REGENERATE_ORDER",
+    "TWEET_SQ_PROMPT",
     "BUCKET_NAME",
     "FILE_AGE"
 ]
@@ -174,6 +175,10 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
     'TWEET2_OVERLAY_ON': 'True',   
     'TWEET2_OVERLAY_URL': '',
     'TWEET2_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
+    'TWEET_SQ_PROMPT': """
+現在は日本時間の{nowDateStr}です。
+前回の自身の発言について自問自答してください。
+""",
     'BUCKET_NAME': 'あなたがCloud Strageに作成したバケット名を入れてください。',
     'FILE_AGE': '1'
 }
@@ -193,6 +198,7 @@ def reload_settings():
     global TWEET_REGENERATE_COUNT
     global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_ON, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_ON, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
+    global TWEET_SQ_PROMPT
     global LINE_REPLY, BUCKET_NAME, FILE_AGE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
@@ -276,9 +282,19 @@ def reload_settings():
         tweet2_order_prompt = tweet2_order_prompt.strip() 
         if '{nowDateStr}' in tweet2_order_prompt:
             tweet2_order_prompt = tweet2_order_prompt.format(nowDateStr=nowDateStr)
+    TWEET_SQ_PROMPT = get_setting('TWEET_SQ_PROMPT')
+    if TWEET_SQ_PROMPT:
+        TWEET_SQ_PROMPT = TWEET_SQ_PROMPT.split(',')
+    else:
+        TWEET_SQ_PROMPT = []
+    tweet_sq_prompt = random.choice(ORDER_PROMPT)
+    tweet_sq_prompt = tweet_sq_prompt.strip()
     
     if '{nowDateStr}' in order_prompt:
         order_prompt = order_prompt.format(nowDateStr=nowDateStr)
+        
+    if '{nowDateStr}' in tweet_sq_prompt:
+        tweet_sq_prompt = tweet_sq_prompt.format(nowDateStr=nowDateStr)
 
 def get_setting(key):
     #print(f"key: {key}")
@@ -629,6 +645,129 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     doc_ref.set(user_data, merge=True)
     print(f"save user doc. user ID: {user_id}")
     return
+
+@app.route('/self-questioning')
+def self-questioning():
+    reload_settings()
     
+    user_id = DEFAULT_USER_ID
+    
+    future = executor.submit(generate_doc_sq, user_id, 0, None)  # Futureオブジェクトを受け取ります
+    try:
+        future.result()
+    except Exception as e:
+        print(f"Error: {e}")  # エラーメッセージを表示します
+        return jsonify({"status": "Creation started"}), 200
+    return jsonify({"status": "Creation started"}), 200
+
+def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
+    print(f"initiated doc. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, r_public_img_url: {r_public_img_url}")
+    doc_ref = db.collection(u'users').document(user_id)
+    print(f"Firestore document reference obtained {doc_ref}")
+            
+    user_doc = doc_ref.get()
+    updated_date = nowDate
+    daily_usage = 0
+    public_img_url = []
+    removed_assistant_messages = []
+    if user_doc.exists:
+        print(f"already exist user doc.  user ID: {user_id}")
+        user_data = user_doc.to_dict()
+        updated_date = user_data['updated_date']
+        updated_date = updated_date.astimezone(jst)
+        daily_usage = user_data['daily_usage']
+        print(f"updated_date: {updated_date}, nowDate: {nowDate}")
+        if nowDate.date() != updated_date.date():
+            daily_usage = 0
+        else:
+            daily_usage = user_data['daily_usage'] + 1
+    else:
+        print(f"create new user doc. user ID: {user_id}")
+        user_data = {
+            'messages': [],
+            'updated_date': nowDate,
+            'daily_usage': 0,
+            'start_free_day': datetime.now(jst),
+            'last_image_url': ""
+        }
+
+    # OpenAI API へのリクエスト
+    messages_for_api = [
+        {'role': 'system', 'content': SYSTEM_PROMPT}
+    ]
+    for msg in user_data['messages']:
+        decrypted_content = get_decrypted_message(msg['content'], hashed_secret_key)
+        messages_for_api.append({'role': msg['role'], 'content': decrypted_content})
+        
+    # この行はループの外で一度だけ行う
+    messages_for_api.append({'role': 'user', 'content': order_prompt})
+
+    # 各メッセージのエンコードされた文字数を合計
+    total_chars = sum([len(encoding.encode(msg['content'])) for msg in messages_for_api])
+
+    # トークン数が制限を超えていれば、最古のメッセージから削除
+    while total_chars > MAX_TOKEN_NUM and len(messages_for_api) > 3:
+        removed_message = messages_for_api.pop(3)  # 最初の3つはシステムとアシスタントのメッセージなので保持
+        total_chars -= len(encoding.encode(removed_message['content']))
+        # もし削除されたメッセージがassistantのものなら、一時リストに追加
+        if removed_message['role'] == 'assistant':
+            removed_assistant_messages.append(removed_message)
+    if bot_reply is None:
+        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, "False")
+        if bot_reply == "":
+            print("Error: not bot_reply")
+            return
+        if isinstance(bot_reply, tuple):
+            bot_reply = bot_reply[0]
+        
+    else:
+        print(f"initiate re run_conversation. messages_for_api: {messages_for_api}")
+        response = run_conversation(AI_MODEL, messages_for_api)
+        bot_reply = response.choices[0].message.content
+        public_img_url = r_public_img_url
+    bot_reply = response_filter(bot_reply)
+    print(f"bot_reply: {bot_reply}, public_img_url: {public_img_url}")
+    extractor = URLExtract()
+    extract_url = extractor.find_urls(bot_reply)
+    if not extract_url:
+        print(f"URL is not include doc.")
+        generate_doc(user_id, retry_count + 1, None)
+        return
+
+    if TWEET1 == 'True':
+        generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
+    time.sleep(10)
+    if TWEET2 == 'True':
+        generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
+
+    if URL_FILTER_ON == 'True':
+        if extract_url:
+            print(f"extract_url: {extract_url}")
+            # リストの最初のURLをエンコードする
+            #encoded_url = quote(extract_url[0])
+            encoded_url = extract_url[0]
+            add_url_to_firestore(encoded_url, user_id)
+        
+        delete_expired_urls('user_id')
+    print(f"user_data: {user_data}")
+
+    #botの返信を追加
+    removed_assistant_messages.append({'role': 'assistant', 'content': bot_reply})
+    # ユーザーデータにremoved_assistant_messagesを再追加
+    if removed_assistant_messages:
+        # 保存されたassistantメッセージをFirestoreに戻す
+        user_data['messages'] = []
+        for msg in removed_assistant_messages:
+            # メッセージを暗号化して保存
+            encrypted_message = get_encrypted_message(msg['content'], hashed_secret_key)
+            user_data['messages'].append({'role': 'assistant', 'content': encrypted_message})
+   
+    user_data['daily_usage'] = daily_usage
+    user_data['updated_date'] = nowDate
+    user_data['last_image_url'] = public_img_url
+    doc_ref.set(user_data, merge=True)
+    print(f"save user doc. user ID: {user_id}")
+    return
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
