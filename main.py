@@ -646,7 +646,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"save user doc. user ID: {user_id}")
     return
 
-@app.route('/sq')
+@app.route('/self-questioning')
 def self-questioning():
     reload_settings()
     
