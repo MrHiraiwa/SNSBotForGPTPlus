@@ -287,7 +287,7 @@ def reload_settings():
         TWEET_SQ_PROMPT = TWEET_SQ_PROMPT.split(',')
     else:
         TWEET_SQ_PROMPT = []
-    tweet_sq_prompt = random.choice(ORDER_PROMPT)
+    tweet_sq_prompt = random.choice(TWEET_SQ_PROMPT)
     tweet_sq_prompt = tweet_sq_prompt.strip()
     
     if '{nowDateStr}' in order_prompt:
