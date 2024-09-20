@@ -706,10 +706,6 @@ def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     extractor = URLExtract()
     extract_url = extractor.find_urls(bot_reply)
-    if not extract_url:
-        print(f"URL is not include doc.")
-        generate_doc(user_id, retry_count + 1, None)
-        return
 
     #if TWEET1 == 'True':
     #    generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
