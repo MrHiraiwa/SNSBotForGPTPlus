@@ -646,20 +646,6 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"save user doc. user ID: {user_id}")
     return
 
-@app.route('/self_questioning')
-def self_questioning():
-    reload_settings()
-    
-    user_id = DEFAULT_USER_ID
-    
-    future = executor.submit(generate_doc_sq, user_id, 0, None)  # Futureオブジェクトを受け取ります
-    try:
-        future.result()
-    except Exception as e:
-        print(f"Error: {e}")  # エラーメッセージを表示します
-        return jsonify({"status": "Creation started"}), 200
-    return jsonify({"status": "Creation started"}), 200
-
 def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"initiated doc. user ID: {user_id}, retry_count: {retry_count}, bot_reply: {bot_reply}, r_public_img_url: {r_public_img_url}")
     doc_ref = db.collection(u'users').document(user_id)
@@ -768,6 +754,21 @@ def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
     doc_ref.set(user_data, merge=True)
     print(f"save user doc. user ID: {user_id}")
     return
+
+@app.route('/self_questioning')
+def self_questioning():
+    reload_settings()
+    
+    user_id = DEFAULT_USER_ID
+    
+    future = executor.submit(generate_doc_sq, user_id, 0, None)  # Futureオブジェクトを受け取ります
+    try:
+        future.result()
+    except Exception as e:
+        print(f"Error: {e}")  # エラーメッセージを表示します
+        return jsonify({"status": "Creation started"}), 200
+    return jsonify({"status": "Creation started"}), 200
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
