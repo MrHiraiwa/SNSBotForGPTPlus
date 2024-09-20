@@ -708,10 +708,10 @@ def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
     extract_url = extractor.find_urls(bot_reply)
 
     #if TWEET1 == 'True':
-    #    generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
-    #time.sleep(10)
-    #if TWEET2 == 'True':
-    #    generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
+        generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
+    time.sleep(10)
+    if TWEET2 == 'True':
+        generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
 
     if URL_FILTER_ON == 'True':
         if extract_url:
