@@ -698,19 +698,10 @@ def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
         # もし削除されたメッセージがassistantのものなら、一時リストに追加
         if removed_message['role'] == 'assistant':
             removed_assistant_messages.append(removed_message)
-    if bot_reply is None:
-        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, "False")
-        if bot_reply == "":
-            print("Error: not bot_reply")
-            return
-        if isinstance(bot_reply, tuple):
-            bot_reply = bot_reply[0]
-        
-    else:
         print(f"initiate re run_conversation. messages_for_api: {messages_for_api}")
-        response = run_conversation(AI_MODEL, messages_for_api)
-        bot_reply = response.choices[0].message.content
-        public_img_url = r_public_img_url
+    response = run_conversation(AI_MODEL, messages_for_api)
+    bot_reply = response.choices[0].message.content
+    public_img_url = r_public_img_url
     bot_reply = response_filter(bot_reply)
     print(f"bot_reply: {bot_reply}, public_img_url: {public_img_url}")
     extractor = URLExtract()
