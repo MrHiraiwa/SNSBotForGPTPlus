@@ -646,7 +646,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
     print(f"save user doc. user ID: {user_id}")
     return
 
-@app.route('/self-questioning')
+@app.route('/sq')
 def self-questioning():
     reload_settings()
     
@@ -700,7 +700,7 @@ def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
         messages_for_api.append({'role': msg['role'], 'content': decrypted_content})
         
     # この行はループの外で一度だけ行う
-    messages_for_api.append({'role': 'user', 'content': order_prompt})
+    messages_for_api.append({'role': 'user', 'content': tweet_sq_prompt})
 
     # 各メッセージのエンコードされた文字数を合計
     total_chars = sum([len(encoding.encode(msg['content'])) for msg in messages_for_api])
@@ -734,11 +734,11 @@ def generate_doc_sq(user_id, retry_count, bot_reply, r_public_img_url=[]):
         generate_doc(user_id, retry_count + 1, None)
         return
 
-    if TWEET1 == 'True':
-        generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
-    time.sleep(10)
-    if TWEET2 == 'True':
-        generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
+    #if TWEET1 == 'True':
+    #    generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
+    #time.sleep(10)
+    #if TWEET2 == 'True':
+    #    generate_tweet("tweet2", user_id, bot_reply, 0, public_img_url)
 
     if URL_FILTER_ON == 'True':
         if extract_url:
