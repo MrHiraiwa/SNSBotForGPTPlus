@@ -93,14 +93,12 @@ DEFAULT_ENV_VARS = {
 """,
     'ORDER_PROMPT': """
 現在は日本時間の{nowDateStr}です。
-次のURLからURLのリストを読み込んで以前とは異なるトピックのニュース記事を選んでください。
-次に、選んだ記事のURLのページの内容を読み込んでから条件に従って文章を生成してください。
+次のURLからURLのリストを読み込んで、リストの中から以前に編集したものとは異なるトピックのニュース記事を選んでください。
 https://news.yahoo.co.jp/
+次に、選んだ記事のURLのページの内容を読み込んで、読み込んだ文章を条件に従って編集してください。
 """,
     'PAINT_PROMPT': """
-Draw the above scene in Japanese Moe anime style. Please do not make it look like a live-action movie. Live-action images of people wearing cosplay or character costumes are also prohibited.
-Please make the drawing style suitable for Japanese people.
-Please give the entire Japanese Moe anime style illustration a sense of pulsation. Give the characters a sense of pulsation by changing their orientation and posture.
+in a vibrant and colorful anime style with soft pastel shades, vibrant colors, cel-shaded.
 """,
     'PARTIAL_MATCH_FILTER_WORDS': 'https://www.yahoo.co.jp/,https://support.yahoo-net.jp/,https://rdr.yahoo.co.jp/,https://yahoo.jp/,https://www.sp-hinan.jp/,https://account.edit.yahoo.co.jp/,https://accounts.yahoo.co.jp/,https://login.yahoo.co.jp/,https://news.yahoo.co.jp/users/,https://news.yahoo.co.jp/purchase,https://news.yahoo.co.jp/settings/,https://news.yahoo.co.jp/flash,https://news.yahoo.co.jp/live,https://news.yahoo.co.jp/expert/,https://news.yahoo.co.jp/original/,https://news.yahoo.co.jp/polls/,https://news.yahoo.co.jp/ranking/,https://news.yahoo.co.jp/paidnews,https://news.yahoo.co.jp/categories,https://news.yahoo.co.jp/topics,https://news.yahoo.co.jp/comment-timeline', 
     'FULL_MATCH_FILTER_WORDS': 'https://news.yahoo.co.jp/',
@@ -120,10 +118,10 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 -読み込んだ記事に対して記者の視点や記事の当事者ではなく、記事を読んだ読者視点でブログ記事を生成してください。 
 -必ず記事内容に関連するキーワードのハッシュタグ(ツイートのような#を頭に付けた単語)を10個以上入れてください。
 -冒頭に「選んだ」「検索した」等の記載は不要です。ブログ記事をなるべく長い感想文にしてください。  
--文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。
+-投稿に参照元のURLを含めないでください。
 """,
     'INSTA_ORDER_PROMPT': """
-以下の記事をインスタグラムに記事として再整形して投稿してください。記事をなるべく長い感想文にしてください。必ず記事に関連するキーワードのハッシュタグ(ツイートのような#を頭に付けた単語)を10個以上入れてください。URLを省略せずに必ず含めてください。
+以下の記事をインスタグラムに記事として再整形して投稿してください。記事をなるべく長い感想文にしてください。必ず記事に関連するキーワードのハッシュタグ(ツイートのような#を頭に付けた単語)を10個以上入れてください。
 """,
     'INSTA_MAX_CHARACTER_COUNT': '99999',
     'INSTA_OVERLAY_ON': 'True',    
@@ -138,7 +136,7 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 -文脈に応じて、任意の場所で絵文字を使ってください。絵文字を最低1個は含めてください。
 ツイートする文字数は日本語で117文字以内にしてください。 
 -ニュースに対して記者の視点やニュースの当事者ではなく、ニュースを読んだ読者視点で感想をツイートしてください。 
--投稿に合ったハッシュタグを付与してください。
+-投稿に合ったハッシュタグを2つまでに限定して付与してください。
 -ツイートに参照元のURLを含めないでください。
 """,
     'TWEET1_ORDER_PROMPT': """
@@ -150,17 +148,6 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
     'TWEET1_REGENERATE_ORDER': '以下の文章はツイートするのに長すぎました。文章を簡潔にするか省略してください。',
     'TWEET2': 'False',
     'TWEET2_SYSTEM_PROMPT': """
-あなたは、Twitter投稿者です。
-下記の条件に従ってツイートしてください。
-条件:
--英語でツイートしてください。
--小学生にもわかりやすく書いてください。
--出力文 は女性を思わせる口語体で記述してください。
--文脈に応じて、任意の場所で絵文字を使ってください。ツイートする文字数はURLを除いて英語で240文字以内にしてください。
--ニュースに対して記者の視点やニュースの当事者ではなく、ニュースを読んだ読者視点で感想をツイートしてください。
--ツイートの一番最後にハイパーリンク形式で参照元のURLを記載してください。
-""",
-    'TWEET2_ORDER_PROMPT': """
 あなたは、Twitter投稿者です。 下記の条件に従ってツイートしてください。 
 条件: 
 -小学生にもわかりやすく書いてください。 
@@ -168,8 +155,11 @@ Please give the entire Japanese Moe anime style illustration a sense of pulsatio
 -文脈に応じて、任意の場所で絵文字を使ってください。絵文字を最低1個は含めてください。
 ツイートする文字数は日本語で117文字以内にしてください。 
 -ニュースに対して記者の視点やニュースの当事者ではなく、ニュースを読んだ読者視点で感想をツイートしてください。 
--投稿に合ったハッシュタグを付与してください。
+-投稿に合ったハッシュタグを2つまでに限定して付与してください。
 -ツイートに参照元のURLを含めないでください。
+""",
+    'TWEET2_ORDER_PROMPT': """
+以下の記事をツイートしてください。 文字数を250文字程度にしてください。
 """,
     'TWEET2_MAX_CHARACTER_COUNT': '280',
     'TWEET2_OVERLAY_ON': 'True',   
