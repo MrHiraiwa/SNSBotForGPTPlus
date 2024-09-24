@@ -180,20 +180,33 @@ def scraping(url, read_text_count, user_id):
                 return  f"SYSTEM:{url}の読み込みに失敗しました。10秒経過したので再度試みてください。"  
 
 def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
-    image_result = ""
+    image_result = None
     if PAINTING_ON  == 'False':
         return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。プロンプトでイラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は過去形で文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。\n![prompt](" + prompt + ")‚![画像](https://dummy.net/dummy.jpg)", image_result
     i_prompt = prompt + "\n" + paint_prompt
     print(f"generate_image prompt:{prompt}")
     try:
-        response = gpt_client.images.generate(
-            model="dall-e-3",
-            prompt=i_prompt,
-            size="1024x1024",
-            quality="standard",
-            n=1,
-        )
-        image_result = response.data[0].url
+        if CORE_IMAGE_TYPE == "Vertex":
+            image_model = ImageGenerationModel.from_pretrained(VERTEX_IMAGE_MODEL)
+            response = model.generate_images(
+                prompt=prompt,
+                number_of_images=1,
+                guidance_scale=float("1024"),
+                aspect_ratio="1:1",
+                language="ja",
+                seed=None,
+            )
+            image_result = response[0]
+
+        else:
+            response = gpt_client.images.generate(
+                model="dall-e-3",
+                prompt=i_prompt,
+                size="1024x1024",
+                quality="standard",
+                n=1,
+            )
+            image_result = response.data[0].url
         print(f"image_result: {image_result}")
         return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。プロンプトでイラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は過去形で文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。\n![prompt](" + prompt + ")‚![画像](https://dummy.net/dummy.jpg)", image_result
     except Exception as e:
@@ -227,7 +240,7 @@ def run_conversation_f(GPT_MODEL, messages):
         print(f"An error occurred: {e}")
         return None  # エラー時には None を返す
 
-def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON='False', max_attempts=10):
+def chatgpt_functions(GPT_MODEL, CORE_IMAGE_TYPE, messages_for_api, USER_ID, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON='False', max_attempts=10):
     image_result = ""
     user_id = USER_ID
     paint_prompt = PAINT_PROMPT
