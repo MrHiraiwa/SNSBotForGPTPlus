@@ -179,7 +179,7 @@ def scraping(url, read_text_count, user_id):
                 time.sleep(10)  # wait for 10 seconds before retrying
                 return  f"SYSTEM:{url}の読み込みに失敗しました。10秒経過したので再度試みてください。"  
 
-def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
+def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
     image_result = None
     if PAINTING_ON  == 'False':
         return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。プロンプトでイラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は過去形で文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。\n![prompt](" + prompt + ")‚![画像](https://dummy.net/dummy.jpg)", image_result
@@ -269,7 +269,7 @@ def chatgpt_functions(GPT_MODEL, CORE_IMAGE_TYPE, messages_for_api, USER_ID, PAI
                         arguments = json.loads(tool_call.function.arguments)
                         if isinstance(arguments["prompt"], list):
                             arguments["prompt"] = " ".join(arguments["prompt"])
-                        bot_reply, image_result = generate_image(arguments["prompt"], paint_prompt, user_id, PAINTING_ON)
+                        bot_reply, image_result = generate_image(CORE_IMAGE_TYPE, arguments["prompt"], paint_prompt, user_id, PAINTING_ON)
                         i_messages_for_api.append({"role": "user", "content": bot_reply})
                         print(f"generate_image: {bot_reply}")
                         if image_result == "" and PAINTING_ON == 'True':
