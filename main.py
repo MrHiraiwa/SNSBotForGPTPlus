@@ -582,7 +582,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         if removed_message['role'] == 'assistant':
             removed_assistant_messages.append(removed_message)
     if bot_reply is None:
-        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
+        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, CORE_IMAGE_TYPE, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
         if bot_reply == "":
             print("Error: not bot_reply")
             return
