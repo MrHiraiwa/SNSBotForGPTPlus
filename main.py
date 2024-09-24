@@ -43,6 +43,7 @@ REQUIRED_ENV_VARS = [
     "AI_MODEL",
     "INSTA_AI_MODEL",
     "TWEET_AI_MODEL",
+    "CORE_IMAGE_TYPE",
     "PARTIAL_MATCH_FILTER_WORDS",
     "FULL_MATCH_FILTER_WORDS",
     "READ_TEXT_COUNT",
@@ -81,6 +82,7 @@ DEFAULT_ENV_VARS = {
     'AI_MODEL': 'gpt-4o-mini',
     'INSTA_AI_MODEL': 'chatgpt-4o-latest',
     'TWEET_AI_MODEL': 'chatgpt-4o-latest',
+    'CORE_IMAGE_TYPE': 'Dall-e',
     'SYSTEM_PROMPT': """
 あなたはプロの編集者です。あなたはURLからURLリストを読み込んだりページの内容を読み込んだりイラストの生成を行うことができます。
 下記の条件に従って読み込んだ文章を編集してください。
@@ -190,6 +192,7 @@ def reload_settings():
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_ON, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
     global TWEET_SQ_PROMPT, tweet_sq_prompt
     global LINE_REPLY, BUCKET_NAME, FILE_AGE
+    global CORE_IMAGE_TYPE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -197,6 +200,7 @@ def reload_settings():
     AI_MODEL = get_setting('AI_MODEL')
     INSTA_AI_MODEL = get_setting('INSTA_AI_MODEL')
     TWEET_AI_MODEL = get_setting('TWEET_AI_MODEL')
+    CORE_IMAGE_TYPE = get_setting('CORE_IMAGE_TYPE')
     SYSTEM_PROMPT = get_setting('SYSTEM_PROMPT')
     ORDER_PROMPT = get_setting('ORDER_PROMPT')
     if ORDER_PROMPT:
