@@ -19,6 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from urllib.parse import urljoin, quote, quote
 import urllib.parse
+from vertexai.preview.vision_models import ImageGenerationModel
 
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
