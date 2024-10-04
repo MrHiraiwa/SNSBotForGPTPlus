@@ -184,8 +184,7 @@ def save_image_locally(image_result):
     filename = f"{uuid.uuid4()}.png"
     
     # 画像をローカルに保存
-    with open(filename, "wb") as image_file:
-        image_file.write(image_result.image_data)  # image_dataを使って画像データを書き込み
+    image_result.save(filename)  # saveメソッドを使用して画像を保存
 
     # 保存した画像のファイルパスを返す
     return filename
