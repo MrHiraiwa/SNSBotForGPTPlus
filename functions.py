@@ -222,10 +222,10 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
         return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。プロンプトでイラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は過去形で文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。\n![prompt](" + prompt + ")‚![画像](https://dummy.net/dummy.jpg)", image_result
     except Exception as e:
         if "content_policy_violation" in str(e):
-            return "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", image_result
+            return "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", None
         time.sleep(10)
         print(f"Errors : {e}")
-        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", image_result
+        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", None
 
 def run_conversation(GPT_MODEL, messages):
     try:
