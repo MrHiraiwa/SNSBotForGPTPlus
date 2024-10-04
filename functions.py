@@ -179,23 +179,15 @@ def scraping(url, read_text_count, user_id):
                 time.sleep(10)  # wait for 10 seconds before retrying
                 return  f"SYSTEM:{url}の読み込みに失敗しました。10秒経過したので再度試みてください。"  
 
-def get_file_url(file_path):
-    # 絶対パスを取得し、それをfile://形式に変換
-    absolute_path = os.path.abspath(file_path)
-    file_url = f"file://{absolute_path}"
-    return file_url
-
 def save_image_locally(image_result):
     # ユニークなファイル名を生成
     filename = f"{uuid.uuid4()}.png"
     
     # 画像をローカルに保存
     image_result.save(filename)  # saveメソッドを使用して画像を保存
-
-    file_url = get_file_url(filename)
     
     # 保存した画像のファイルパスを返す
-    return file_url
+    return filename
 
 def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
     image_result = None
