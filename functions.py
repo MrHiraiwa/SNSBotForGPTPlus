@@ -196,6 +196,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
                 language="ja",
                 seed=None,
             )
+            print(f"Vertex image response:{response}")
             image_result = response[0]
 
         else:
