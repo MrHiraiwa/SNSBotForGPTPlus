@@ -179,6 +179,17 @@ def scraping(url, read_text_count, user_id):
                 time.sleep(10)  # wait for 10 seconds before retrying
                 return  f"SYSTEM:{url}の読み込みに失敗しました。10秒経過したので再度試みてください。"  
 
+def save_image_locally(image_result):
+    # ユニークなファイル名を生成
+    filename = f"{uuid.uuid4()}.png"
+    
+    # 画像をローカルに保存
+    with open(filename, "wb") as image_file:
+        image_file.write(image_result.image_data)  # image_dataを使って画像データを書き込み
+
+    # 保存した画像のファイルパスを返す
+    return filename
+
 def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
     image_result = None
     if PAINTING_ON  == 'False':
@@ -197,7 +208,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
                 seed=None,
             )
             print(f"Vertex image response:{response}")
-            image_result = response[0]
+            image_result = save_image_locally(response[0])
 
         else:
             response = gpt_client.images.generate(
