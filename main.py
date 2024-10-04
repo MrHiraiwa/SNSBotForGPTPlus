@@ -208,6 +208,10 @@ def reload_settings():
     else:
         ORDER_PROMPT = []
     PAINT_PROMPT = get_setting('PAINT_PROMPT')
+    if PAINT_PROMPT:
+        PAINT_PROMPT = PAINT_PROMPT.split(',')
+    else:
+        PAINT_PROMPT = []
     PARTIAL_MATCH_FILTER_WORDS = get_setting('PARTIAL_MATCH_FILTER_WORDS')
     if PARTIAL_MATCH_FILTER_WORDS:
         PARTIAL_MATCH_FILTER_WORDS = PARTIAL_MATCH_FILTER_WORDS.split(',')
@@ -261,6 +265,8 @@ def reload_settings():
     FILE_AGE = get_setting('FILE_AGE')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
+    paint_prompt = random.choice(PAINT_PROMPT)
+    paint_prompt = paint_prompt.strip()
     if INSTA_ORDER_PROMPT:
         insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
         insta_order_prompt = insta_order_prompt.strip() 
@@ -582,7 +588,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         if removed_message['role'] == 'assistant':
             removed_assistant_messages.append(removed_message)
     if bot_reply is None:
-        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, CORE_IMAGE_TYPE, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
+        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, CORE_IMAGE_TYPE, messages_for_api, user_id, paint_prompt, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
         if bot_reply == "":
             print("Error: not bot_reply")
             return
