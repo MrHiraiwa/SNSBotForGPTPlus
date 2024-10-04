@@ -188,7 +188,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
     try:
         if CORE_IMAGE_TYPE == "Vertex":
             image_model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
-            response = model.generate_images(
+            response = image_model.generate_images(
                 prompt=prompt,
                 number_of_images=1,
                 guidance_scale=float("1024"),
