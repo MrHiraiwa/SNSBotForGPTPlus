@@ -194,7 +194,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
     if PAINTING_ON  == 'False':
         return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。プロンプトでイラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は過去形で文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。\n![prompt](" + prompt + ")‚![画像](https://dummy.net/dummy.jpg)", image_result
     i_prompt = prompt + "\n" + paint_prompt
-    print(f"generate_image prompt:{prompt}")
+    print(f"generate_image prompt:{i_prompt }")
     try:
         if CORE_IMAGE_TYPE == "Vertex":
             image_model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
