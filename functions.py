@@ -19,6 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from urllib.parse import urljoin, quote, quote
 import urllib.parse
+from vertexai.preview.vision_models import ImageGenerationModel
 
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
@@ -178,29 +179,53 @@ def scraping(url, read_text_count, user_id):
                 time.sleep(10)  # wait for 10 seconds before retrying
                 return  f"SYSTEM:{url}の読み込みに失敗しました。10秒経過したので再度試みてください。"  
 
-def generate_image(prompt, paint_prompt, user_id, PAINTING_ON):
-    image_result = ""
+def save_image_locally(image_result):
+    # ユニークなファイル名を生成
+    filename = f"{uuid.uuid4()}.png"
+    
+    # 画像をローカルに保存
+    image_result.save(filename)  # saveメソッドを使用して画像を保存
+    
+    # 保存した画像のファイルパスを返す
+    return filename
+
+def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
+    image_result = None
     if PAINTING_ON  == 'False':
         return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。プロンプトでイラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は過去形で文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。\n![prompt](" + prompt + ")‚![画像](https://dummy.net/dummy.jpg)", image_result
     i_prompt = prompt + "\n" + paint_prompt
-    print(f"generate_image prompt:{prompt}")
+    print(f"generate_image prompt:{i_prompt }")
     try:
-        response = gpt_client.images.generate(
-            model="dall-e-3",
-            prompt=i_prompt,
-            size="1024x1024",
-            quality="standard",
-            n=1,
-        )
-        image_result = response.data[0].url
+        if CORE_IMAGE_TYPE == "Vertex":
+            image_model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
+            response = image_model.generate_images(
+                prompt=i_prompt,
+                number_of_images=1,
+                guidance_scale=float("1024"),
+                aspect_ratio="1:1",
+                language="ja",
+                seed=None,
+            )
+            print(f"Vertex image response:{response}")
+            image_result = save_image_locally(response[0])
+
+        else:
+            response = gpt_client.images.generate(
+                model="dall-e-3",
+                prompt=i_prompt,
+                size="1024x1024",
+                quality="standard",
+                n=1,
+            )
+            image_result = response.data[0].url
         print(f"image_result: {image_result}")
         return "SYSTEM: 現在、日本時刻で" + nowDateStr + "です。プロンプトでイラストを生成しました。先ほど読み込んだページの情報を元に、できるだけ文章量を膨らませて文章を生成してください。ページの情報が現在日時よりも古かった場合は過去形で文章を生成してください。文章の一番最後にハイパーリンク形式で参照元のURLを記載してください。\n![prompt](" + prompt + ")‚![画像](https://dummy.net/dummy.jpg)", image_result
     except Exception as e:
         if "content_policy_violation" in str(e):
-            return "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", image_result
+            return "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", None
         time.sleep(10)
         print(f"Errors : {e}")
-        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", image_result
+        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", None
 
 def run_conversation(GPT_MODEL, messages):
     try:
@@ -226,7 +251,7 @@ def run_conversation_f(GPT_MODEL, messages):
         print(f"An error occurred: {e}")
         return None  # エラー時には None を返す
 
-def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON='False', max_attempts=10):
+def chatgpt_functions(GPT_MODEL, CORE_IMAGE_TYPE, messages_for_api, USER_ID, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON='False', max_attempts=10):
     image_result = ""
     user_id = USER_ID
     paint_prompt = PAINT_PROMPT
@@ -255,10 +280,10 @@ def chatgpt_functions(GPT_MODEL, messages_for_api, USER_ID, PAINT_PROMPT, READ_T
                         arguments = json.loads(tool_call.function.arguments)
                         if isinstance(arguments["prompt"], list):
                             arguments["prompt"] = " ".join(arguments["prompt"])
-                        bot_reply, image_result = generate_image(arguments["prompt"], paint_prompt, user_id, PAINTING_ON)
+                        bot_reply, image_result = generate_image(CORE_IMAGE_TYPE, arguments["prompt"], paint_prompt, user_id, PAINTING_ON)
                         i_messages_for_api.append({"role": "user", "content": bot_reply})
                         print(f"generate_image: {bot_reply}")
-                        if image_result == "" and PAINTING_ON == 'True':
+                        if image_result == None and PAINTING_ON == 'True':
                             generate_image_called = False
                         attempt += 1
                     elif hasattr(tool_call, 'function') and tool_call.function.name == "scraping" and not scraping_called:

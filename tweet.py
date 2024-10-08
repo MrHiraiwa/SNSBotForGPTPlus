@@ -311,6 +311,8 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
     print(f"{tweet_no} character_count: {character_count}")
     extract_url = extract_urls_with_indices(bot_reply)
 
+
+    
     if extract_url:
         print(f"extract_url:{extract_url}")
     else:
@@ -320,10 +322,20 @@ def generate_tweet(tweet_no, user_id, bot_reply, retry_count=0, public_img_url=[
         #return
         
     if 1 <= character_count <= tweet_max_character_count:
-            
+
         if public_img_url:
-            # Download image from URL
-            base_img = get_image_with_retry(public_img_url)
+            # Check if public_img_url is a file path or URL
+            if public_img_url.startswith('http://') or public_img_url.startswith('https://'):
+                # URL case
+                print(f"public_img_url is a URL: {public_img_url}")
+                base_img = get_image_with_retry(public_img_url)
+            elif os.path.exists(public_img_url):
+                # Local file path case
+                print(f"public_img_url is a local file: {public_img_url}")
+                base_img = Image.open(public_img_url)
+            else:
+                print(f"Invalid public_img_url: {public_img_url}")
+
             overlay_img = None
             combined_img = None
             if tweet_no == "tweet1" and TWEET1_OVERLAY_ON == 'True':

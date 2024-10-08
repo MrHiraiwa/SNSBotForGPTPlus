@@ -247,10 +247,20 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
     print(f"before filtered bot_reply: {bot_reply}")
     bot_reply = response_filter(bot_reply)
     print(f"insta bot_reply: {bot_reply}, public_img_url: {public_img_url}")
-        
+
     if public_img_url:
-        # Download image from URL
-        base_img = get_image_with_retry(public_img_url)
+        # Check if public_img_url is a file path or URL
+        if public_img_url.startswith('http://') or public_img_url.startswith('https://'):
+            # URL case
+            print(f"public_img_url is a URL: {public_img_url}")
+            base_img = get_image_with_retry(public_img_url)
+        elif os.path.exists(public_img_url):
+            # Local file path case
+            print(f"public_img_url is a local file: {public_img_url}")
+            base_img = Image.open(public_img_url)
+        else:
+            print(f"Invalid public_img_url: {public_img_url}")
+        
         overlay_img = None
         combined_img = None
         if INSTA_OVERLAY_ON == 'True':

@@ -43,6 +43,7 @@ REQUIRED_ENV_VARS = [
     "AI_MODEL",
     "INSTA_AI_MODEL",
     "TWEET_AI_MODEL",
+    "CORE_IMAGE_TYPE",
     "PARTIAL_MATCH_FILTER_WORDS",
     "FULL_MATCH_FILTER_WORDS",
     "READ_TEXT_COUNT",
@@ -81,6 +82,7 @@ DEFAULT_ENV_VARS = {
     'AI_MODEL': 'gpt-4o-mini',
     'INSTA_AI_MODEL': 'chatgpt-4o-latest',
     'TWEET_AI_MODEL': 'chatgpt-4o-latest',
+    'CORE_IMAGE_TYPE': 'Dall-e',
     'SYSTEM_PROMPT': """
 あなたはプロの編集者です。あなたはURLからURLリストを読み込んだりページの内容を読み込んだりイラストの生成を行うことができます。
 下記の条件に従って読み込んだ文章を編集してください。
@@ -182,7 +184,7 @@ except Exception as e:
 
 def reload_settings():
     print("execute reload_settings")
-    global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, nowDate, nowDateStr, jst, AI_MODEL, INSTA_AI_MODEL, TWEET_AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
+    global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, paint_prompt, nowDate, nowDateStr, jst, AI_MODEL, INSTA_AI_MODEL, TWEET_AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
     global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_ON, INSTA_OVERLAY_URL, insta_order_prompt
     global TWEET_REGENERATE_COUNT
@@ -190,6 +192,7 @@ def reload_settings():
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_ON, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
     global TWEET_SQ_PROMPT, tweet_sq_prompt
     global LINE_REPLY, BUCKET_NAME, FILE_AGE
+    global CORE_IMAGE_TYPE
     jst = pytz.timezone('Asia/Tokyo')
     nowDate = datetime.now(jst)
     nowDateStr = nowDate.strftime('%Y年%m月%d日 %H:%M:%S')
@@ -197,6 +200,7 @@ def reload_settings():
     AI_MODEL = get_setting('AI_MODEL')
     INSTA_AI_MODEL = get_setting('INSTA_AI_MODEL')
     TWEET_AI_MODEL = get_setting('TWEET_AI_MODEL')
+    CORE_IMAGE_TYPE = get_setting('CORE_IMAGE_TYPE')
     SYSTEM_PROMPT = get_setting('SYSTEM_PROMPT')
     ORDER_PROMPT = get_setting('ORDER_PROMPT')
     if ORDER_PROMPT:
@@ -204,6 +208,10 @@ def reload_settings():
     else:
         ORDER_PROMPT = []
     PAINT_PROMPT = get_setting('PAINT_PROMPT')
+    if PAINT_PROMPT:
+        PAINT_PROMPT = PAINT_PROMPT.split(',')
+    else:
+        PAINT_PROMPT = []
     PARTIAL_MATCH_FILTER_WORDS = get_setting('PARTIAL_MATCH_FILTER_WORDS')
     if PARTIAL_MATCH_FILTER_WORDS:
         PARTIAL_MATCH_FILTER_WORDS = PARTIAL_MATCH_FILTER_WORDS.split(',')
@@ -257,6 +265,8 @@ def reload_settings():
     FILE_AGE = get_setting('FILE_AGE')
     order_prompt = random.choice(ORDER_PROMPT)
     order_prompt = order_prompt.strip()
+    paint_prompt = random.choice(PAINT_PROMPT)
+    paint_prompt = paint_prompt.strip()
     if INSTA_ORDER_PROMPT:
         insta_order_prompt = random.choice(INSTA_ORDER_PROMPT)
         insta_order_prompt = insta_order_prompt.strip() 
@@ -578,7 +588,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         if removed_message['role'] == 'assistant':
             removed_assistant_messages.append(removed_message)
     if bot_reply is None:
-        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, messages_for_api, user_id, PAINT_PROMPT, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
+        bot_reply, public_img_url = chatgpt_functions(AI_MODEL, CORE_IMAGE_TYPE, messages_for_api, user_id, paint_prompt, READ_TEXT_COUNT, READ_LINKS_COUNT, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS, PAINTING_ON)
         if bot_reply == "":
             print("Error: not bot_reply")
             return
@@ -599,7 +609,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         generate_doc(user_id, retry_count + 1, None)
         return
 
-    if INSTA == 'True' and PAINTING_ON == 'True':
+    if INSTA == 'True' and PAINTING_ON == 'True' and public_img_url:
         generate_insta(user_id, bot_reply, public_img_url)
     if TWEET1 == 'True':
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
