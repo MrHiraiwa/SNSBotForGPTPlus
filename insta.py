@@ -202,7 +202,13 @@ def facebook_upload_image(caption, image_url):
         'access_token': INSTA_ACCESS_TOKEN  # Instagramと同じアクセストークンを使用
     }
     response = requests.post(url, data=data)
+    
+    # レスポンスのステータスコードと内容を確認する
+    if response.status_code != 200:
+        print(f"Facebook API Error: {response.status_code}, {response.content}")
+    
     return json.loads(response.content)
+
 
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
