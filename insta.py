@@ -193,6 +193,7 @@ def instagram_upload_image(params, image_url):
         return None
 
 def facebook_upload_image(caption, image_url):
+    print(f"Facebook Page ID: {FACEBOOK_PAGE_ID}")
     # Facebookに画像を投稿
     url = f"https://graph.facebook.com/v18.0/{FACEBOOK_PAGE_ID}/photos"
     data = {
