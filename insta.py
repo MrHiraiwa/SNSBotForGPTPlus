@@ -239,7 +239,7 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         print(f"Failed to upload file: {e}")
         raise
 
-def generate_insta_and_fb(user_id, bot_reply, FACEBOOK, INSTA, public_img_url=[]):
+def generate_insta_and_fb(user_id, bot_reply, INSTA, FACEBOOK, public_img_url=[]):
     reload_settings()
     r_bot_reply = bot_reply
     print(f"initiated insta. user ID: {user_id}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
