@@ -100,7 +100,6 @@ https://news.yahoo.co.jp/
 次に、選んだ記事のURLのページの内容を読み込んで、読み込んだ文章を条件に従って編集してください。
 """,
     'PAINT_PROMPT': """
-in a vibrant and colorful anime style with soft pastel shades, vibrant colors, cel-shaded.
 """,
     'PARTIAL_MATCH_FILTER_WORDS': 'https://www.yahoo.co.jp/,https://support.yahoo-net.jp/,https://rdr.yahoo.co.jp/,https://yahoo.jp/,https://www.sp-hinan.jp/,https://account.edit.yahoo.co.jp/,https://accounts.yahoo.co.jp/,https://login.yahoo.co.jp/,https://news.yahoo.co.jp/users/,https://news.yahoo.co.jp/purchase,https://news.yahoo.co.jp/settings/,https://news.yahoo.co.jp/flash,https://news.yahoo.co.jp/live,https://news.yahoo.co.jp/expert/,https://news.yahoo.co.jp/original/,https://news.yahoo.co.jp/polls/,https://news.yahoo.co.jp/ranking/,https://news.yahoo.co.jp/paidnews,https://news.yahoo.co.jp/categories,https://news.yahoo.co.jp/topics,https://news.yahoo.co.jp/comment-timeline', 
     'FULL_MATCH_FILTER_WORDS': 'https://news.yahoo.co.jp/',
