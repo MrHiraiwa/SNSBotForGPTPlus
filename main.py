@@ -25,7 +25,7 @@ from PIL import Image
 from urlextract import URLExtract
 
 from functions import chatgpt_functions, run_conversation
-from insta import generate_insta
+from insta import generate_insta_and_fb
 from tweet import generate_tweet
 
 API_KEY = os.getenv('API_KEY')
@@ -58,6 +58,7 @@ REQUIRED_ENV_VARS = [
     "INSTA_MAX_CHARACTER_COUNT",
     "INSTA_OVERLAY_ON",
     "INSTA_OVERLAY_URL",
+    "FACEBOOK",
     "TWEET_REGENERATE_COUNT",
     "TWEET1",
     "TWEET1_SYSTEM_PROMPT",
@@ -127,6 +128,7 @@ https://news.yahoo.co.jp/
     'INSTA_MAX_CHARACTER_COUNT': '99999',
     'INSTA_OVERLAY_ON': 'True',    
     'INSTA_OVERLAY_URL': '',
+    'FACEBOOK': 'False',
     'TWEET_REGENERATE_COUNT': '7',
     'TWEET1': 'False',
     'TWEET1_SYSTEM_PROMPT': """
@@ -186,6 +188,7 @@ def reload_settings():
     global SYSTEM_PROMPT, ORDER_PROMPT, PAINT_PROMPT, paint_prompt, nowDate, nowDateStr, jst, AI_MODEL, INSTA_AI_MODEL, TWEET_AI_MODEL, PARTIAL_MATCH_FILTER_WORDS, FULL_MATCH_FILTER_WORDS
     global READ_TEXT_COUNT,READ_LINKS_COUNT, MAX_TOKEN_NUM, PAINTING_ON, DEFAULT_USER_ID, order_prompt, URL_FILTER_ON
     global INSTA, INSTA_SYSTEM_PROMPT, INSTA_ORDER_PROMPT, INSTA_MAX_CHARACTER_COUNT, INSTA_OVERLAY_ON, INSTA_OVERLAY_URL, insta_order_prompt
+    global FACEBOOK
     global TWEET_REGENERATE_COUNT
     global TWEET1, TWEET1_SYSTEM_PROMPT, TWEET1_ORDER_PROMPT, TWEET1_MAX_CHARACTER_COUNT, TWEET1_OVERLAY_ON, TWEET1_OVERLAY_URL, tweet1_order_prompt, TWEET1_REGENERATE_ORDER
     global TWEET2, TWEET2_SYSTEM_PROMPT, TWEET2_ORDER_PROMPT, TWEET2_MAX_CHARACTER_COUNT, TWEET2_OVERLAY_ON, TWEET2_OVERLAY_URL, tweet2_order_prompt, TWEET2_REGENERATE_ORDER
@@ -237,6 +240,7 @@ def reload_settings():
     INSTA_MAX_CHARACTER_COUNT = int(get_setting('INSTA_MAX_CHARACTER_COUNT') or 0)
     INSTA_OVERLAY_ON = get_setting('INSTA_OVERLAY_ON')
     INSTA_OVERLAY_URL = get_setting('INSTA_OVERLAY_URL')
+    FACEBOOK = get_setting('FACEBOOK')
     TWEET_REGENERATE_COUNT = int(get_setting('TWEET_REGENERATE_COUNT') or 5)
     TWEET1 = get_setting('TWEET1')
     TWEET1_SYSTEM_PROMPT = get_setting('TWEET1_SYSTEM_PROMPT')
@@ -609,7 +613,7 @@ def generate_doc(user_id, retry_count, bot_reply, r_public_img_url=[]):
         return
 
     if INSTA == 'True' and PAINTING_ON == 'True' and public_img_url:
-        generate_insta(user_id, bot_reply, public_img_url)
+        generate_insta_and_fb(user_id, bot_reply, INSTA, FACEBOOK, public_img_url)
     if TWEET1 == 'True':
         generate_tweet("tweet1", user_id, bot_reply, 0, public_img_url)
     time.sleep(10)
