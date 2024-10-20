@@ -225,7 +225,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
             return "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", None
         time.sleep(10)
         print(f"Errors : {e}")
-        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", None
+        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}のプロンプト内容からより抽象的な内容にして再度画像を生成してください。", None
 
 def run_conversation(GPT_MODEL, messages):
     try:
