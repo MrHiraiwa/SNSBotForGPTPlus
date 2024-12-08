@@ -205,6 +205,8 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
                 aspect_ratio="1:1",
                 language="ja",
                 seed=None,
+                safety_filter_level="block_some",
+                person_generation="allow_all",
             )
             print(f"Vertex image response:{response}")
             image_result = save_image_locally(response[0])
