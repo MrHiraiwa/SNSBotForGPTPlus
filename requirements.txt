@@ -19,4 +19,5 @@ pycryptodome
 Pillow
 urlextract
 google-cloud-aiplatform
-setuptools
+setuptools==69.5.1
+
