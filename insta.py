@@ -20,6 +20,7 @@ from insta_functions import run_conversation
 
 INSTA_ACCESS_TOKEN = os.getenv('INSTA_ACCESS_TOKEN')
 INSTA_BUSINESS_ACCOUNT = os.getenv('INSTA_BUSINESS_ACCOUNT')
+FACEBOOK_PAGE_ID = os.getenv('FACEBOOK_PAGE_ID')
 
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
@@ -191,6 +192,24 @@ def instagram_upload_image(params, image_url):
         print("Failed to create media. Check the media_response for error details.")
         return None
 
+def facebook_upload_image(caption, image_url):
+    print(f"Facebook Page ID: {FACEBOOK_PAGE_ID}")
+    # Facebookに画像を投稿
+    url = f"https://graph.facebook.com/v18.0/{FACEBOOK_PAGE_ID}/photos"
+    data = {
+        'url': image_url,
+        'caption': caption,
+        'access_token': INSTA_ACCESS_TOKEN  # Instagramと同じアクセストークンを使用
+    }
+    response = requests.post(url, data=data)
+    
+    # レスポンスのステータスコードと内容を確認する
+    if response.status_code != 200:
+        print(f"Facebook API Error: {response.status_code}, {response.content}")
+    
+    return json.loads(response.content)
+
+
 def set_bucket_lifecycle(bucket_name, age):
     storage_client = storage.Client()
     bucket = storage_client.get_bucket(bucket_name)
@@ -227,7 +246,7 @@ def upload_blob(bucket_name, source_stream, destination_blob_name, content_type=
         print(f"Failed to upload file: {e}")
         raise
 
-def generate_insta(user_id, bot_reply, public_img_url=[]):
+def generate_insta_and_fb(user_id, bot_reply, INSTA, FACEBOOK, public_img_url=[]):
     reload_settings()
     r_bot_reply = bot_reply
     print(f"initiated insta. user ID: {user_id}, bot_reply: {bot_reply}, public_img_url: {public_img_url}")
@@ -299,7 +318,12 @@ def generate_insta(user_id, bot_reply, public_img_url=[]):
 
 
         # 画像をアップロード
-        instagram_upload_image(params, image_url)
+        if INSTA == 'True':
+            instagram_upload_image(params, image_url)
+            print("post Instagram")
+        if FACEBOOK == 'True':
+            facebook_upload_image(params, image_url)
+            print("post Facebook")
     else:
-        print("Error: it has not include image URL.can not post instagram")
+        print("Error: it has not include image URL.can not post Instagram and fb.")
     return

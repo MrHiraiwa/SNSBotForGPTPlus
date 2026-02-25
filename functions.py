@@ -197,7 +197,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
     print(f"generate_image prompt:{i_prompt }")
     try:
         if CORE_IMAGE_TYPE == "Vertex":
-            image_model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
+            image_model = ImageGenerationModel.from_pretrained("imagen-4.0-generate-001")
             response = image_model.generate_images(
                 prompt=i_prompt,
                 number_of_images=1,
@@ -205,6 +205,8 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
                 aspect_ratio="1:1",
                 language="ja",
                 seed=None,
+                safety_filter_level="block_some",
+                person_generation="allow_all",
             )
             print(f"Vertex image response:{response}")
             image_result = save_image_locally(response[0])
@@ -225,7 +227,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
             return "SYSTEM: 先ほど読み込んだページの内容からイメージを詳細に思い描いて画像を再生成してください。画像生成の実行には長い文章を指定して、より具体的な画像が生成されるようにしてください。", None
         time.sleep(10)
         print(f"Errors : {e}")
-        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}の内容で再度画像を生成してください。", None
+        return f"SYSTEM: 画像生成にエラーが発生しました。{prompt}のプロンプト内容からよりソフトな内容にして再度画像を生成してください。", None
 
 def run_conversation(GPT_MODEL, messages):
     try:
@@ -340,3 +342,4 @@ def chatgpt_functions(GPT_MODEL, CORE_IMAGE_TYPE, messages_for_api, USER_ID, PAI
         return "", image_result
     
     return bot_reply, image_result
+
