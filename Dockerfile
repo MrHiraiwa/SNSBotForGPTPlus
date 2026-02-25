@@ -10,25 +10,12 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-# Install production dependencies.
-RUN apt-get update && apt-get install -y wget curl unzip gnupg 
+RUN apt-get update && apt-get install -y chromium chromium-driver
 
-# Download and install Chrome
-RUN wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_122.0.6261.57-1_amd64.deb &&\
-    dpkg -i google-chrome-stable_122.0.6261.57-1_amd64.deb || apt-get install -fy
-
-# TODO: You will also need to install the matching ChromeDriver version. 
-# However, finding the exact ChromeDriver version for older Chrome versions can be challenging. 
-# Make sure to replace the ChromeDriver download URL with the correct version.
-
-RUN wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.57/linux64/chromedriver-linux64.zip &&\
-    unzip chromedriver-linux64.zip &&\
-    mv chromedriver-linux64/chromedriver /usr/bin/chromedriver &&\
-    chown root:root /usr/bin/chromedriver &&\
-    chmod +x /usr/bin/chromedriver
-
+# Pythonのセットアップツール環境を整える（先ほど追加していただいた部分）
 RUN pip install --no-cache-dir --upgrade pip "setuptools==69.5.1"
 
+# requirements.txtのインストール
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
@@ -37,5 +24,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 # to be equal to the cores available.
 # Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app
-
-
