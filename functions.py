@@ -69,7 +69,7 @@ options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
 from selenium.webdriver.chrome.service import Service
 
 # ブラウザ本体(Chrome)とドライバー(ChromeDriver)のパスを明示的に指定して、勝手なダウンロードを防ぐ
-options.binary_location = '/usr/bin/google-chrome'
+options.binary_location = '/usr/bin/chromium'
 service = Service(executable_path='/usr/bin/chromedriver')
 
 driver = webdriver.Chrome(service=service, options=options)
@@ -349,5 +349,6 @@ def chatgpt_functions(GPT_MODEL, CORE_IMAGE_TYPE, messages_for_api, USER_ID, PAI
         return "", image_result
     
     return bot_reply, image_result
+
 
 
