@@ -27,6 +27,8 @@ RUN wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.57/
     chown root:root /usr/bin/chromedriver &&\
     chmod +x /usr/bin/chromedriver
 
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
@@ -35,3 +37,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # to be equal to the cores available.
 # Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app
+
