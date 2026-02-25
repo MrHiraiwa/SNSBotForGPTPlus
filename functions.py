@@ -197,7 +197,7 @@ def generate_image(CORE_IMAGE_TYPE, prompt, paint_prompt, user_id, PAINTING_ON):
     print(f"generate_image prompt:{i_prompt }")
     try:
         if CORE_IMAGE_TYPE == "Vertex":
-            image_model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
+            image_model = ImageGenerationModel.from_pretrained("imagen-4.0-generate-001")
             response = image_model.generate_images(
                 prompt=i_prompt,
                 number_of_images=1,
@@ -342,3 +342,4 @@ def chatgpt_functions(GPT_MODEL, CORE_IMAGE_TYPE, messages_for_api, USER_ID, PAI
         return "", image_result
     
     return bot_reply, image_result
+
